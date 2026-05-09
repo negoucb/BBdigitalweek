@@ -1,379 +1,295 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-    <head>
-         <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <link rel="stylesheet" type="text/css" href="bbcss.css">
-     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="bbcss.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>BB Digital Week</title>
+  </head>
+  <body>
 
-  <title>BB Digital Week</title>
-    </head>
- <body>
-        <div class="navbar">
+    <div class="navbar">
+      <img class="bblogo" src="imgbb/7.png" alt="">
 
-    <img class="bblogo" src="https://play-lh.googleusercontent.com/6QHTLD6fLCZXYZ2d9HKntuL8vB-_n3ks-y8rSE_nqQSPi_5_IfI1N-4KxX12HA3JOphl_TZhofXu3jjwMvXCxbk=w240-h480-rw" alt="">
-
-
-
-
-<div class="dropdown">
-  <button class="dropmenu textmenu" onclick="toggleMenu()">
-   <img src="C:\Users\gabi5\Downloads\2.png" width="3000" height="150">
-  </button>
-
-  
-  <div id="dropdownMenu" class="dropdown-content">
-    <a href="bbmenuC.html">Programação geral</a>
-    <a href="Editar.html">Editar programação</a>
-    <a href="Conteúdo.html">Conteúdo e participantes</a>
-    <a href="#">Keymote</a>
-  </div>
-  
-</div>
-
-<div class="a">
-  <button class="dropmenu textmenu" onclick="toggleMenu()">
-   <img src="C:\Users\gabi5\Downloads\3.png" width="2000" height="100">
-  </button>
-
-  
-  <div id="dropdownMenu" class="dropdown-content">
-    <a href="consulta.html">Conta</a>
-    <a href="catálogo.html">Sair</a>
-  
-  </div>
-  
-</div>
-
-</div>
+      
+     
 
 
-<div class="centro">
+      <div class="a">
+        <button class="dropmenu textmenu" onclick="toggleMenu('dropdownMenu2')">
+          <img src="C:\Users\gabi5\Downloads\3.png" width="2000" height="100">
+        </button>
+        <div id="dropdownMenu2" class="dropdown-content">
+          <a href="consulta.html">Conta</a>
+          <a href="catálogo.html">Sair</a>
+        </div>
+      </div>
 
-    <div class="spacebar">
+    </div>
+
+
+    <div class="centro">
+
+      <div class="spacebar">
         <div class="leftbar">
-           
-            <div>
-              <h1 style="font-size: 27px; text-align: center;"> Ferramentas
-                    <img class="icon" src="https://www.kusd.edu/wp-content/uploads/2021/09/Drop-down-arrow-icon-rounded.png" alt="Descrição" width="30" height="30">
+  <nav class="sidebar">
 
-              </h1> 
-                <hr>
-            <button class="ferramentas" onclick="abrirFormulario()"> Adicionar atividade 
-                                  <img class="icon" src="https://uxwing.com/wp-content/themes/uxwing/download/user-interface/add-round-white-icon.png" alt="Descrição" width="50" height="50">
+  <div class="sidebar-section-label">Principal</div>
+  <div class="nav-item active" onclick="navigate('dashboard', this)">
+    <span class="nav-icon">◈</span> Dashboard
+  </div>
+  <div class="nav-item" onclick="navigate('grade', this)">
+    <span class="nav-icon">▦</span> Cronograma
+  </div>
+  <div class="nav-item" onclick="navigate('propostas', this)">
+    <span class="nav-icon">◧</span> Alertas de IA
+  </div>
 
-            </button>
-            <hr>
-          
-            <button class="ferramentas" onclick="toggleModoEdicao()"> Editar planilha
-                                  <img class="icon"  src="https://upload.wikimedia.org/wikipedia/commons/3/3e/White_pencil.png" alt="Descrição" width="50" height="50">
+  <div class="sidebar-section-label">Conteúdo</div>
+  <div class="nav-item" onclick="navigate('trilhas', this)">
+    <span class="nav-icon">◉</span> Trilhas
+  </div>
+  <div class="nav-item" onclick="navigate('palestrantes', this)">
+    <span class="nav-icon">◎</span> Sessões
+  </div>
+  <div class="nav-item" onclick="navigate('espacos', this)">
+    <span class="nav-icon">⬡</span> Espaço e locais
+  </div>
 
-            </button> 
-      <hr>
-  
-            </div>
-        </div>
-        </div>
- 
-    <div id="tabela-area">
+  <div class="nav-item" onclick="navigate('ia', this)" style="position:relative;">
+    <span class="nav-icon">✦</span> Slots e horário
 
- <div class="wrapper">
-    
+  </div>
 
-         
-    <div class="table-container">
+</nav>
+</div>
+</div>
 
-    <div class="filters-bar" id="filtersBar">
+  <section id="dashboard" class="page">
+    <div class="spacePage">
+    <h1>Trilhas</h1>
+    <p>Conteúdo das trilhas aqui.</p>
 
-        <input type="time">
-<select>
-            <option>Conteúdo</option>
-            <option>Tecnologia</option>
-            <option>empreendedorismo</option>
-        </select>
 
-        <select>
-            <option>Todos os tipos</option>
-            <option>Palestra</option>
-            <option>Workshop</option>
-        </select>
+    <div class="overview-grid">
 
-        <select>
-            <option>Todos os locais</option>
-            <option>Planalto Verde</option>
-        </select>
+  <div class="overview-card">
+    Card 1
+  </div>
 
-        <select>
-            <option>Todos os status</option>
-            <option>Verificado</option>
-            <option>Em andamento</option>
-        </select>
+  <div class="overview-card">
+    Card 2
+  </div>
+
+  <div class="overview-card">
+    Card 3
+  </div>
+
+  <div class="overview-card">
+    Card 4
+  </div>
+
+</div>
+
+    <div class="overview-grid">
+
+  <div class="overview-card">
+    Card 1
+  </div>
+
+  <div class="overview-card">
+    Card 2
+  </div>
+   </div>
 
     </div>
-      <!-- Header -->
-      <div class="table-header">
-    
-        <div class="filter-btn" onclick="toggleFiltros()">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="22" height="22">
-            <path d="M3 4a1 1 0 0 1 1-1h16a1 1 0 0 1 .78 1.625L14 13.506V19a1 1 0 0 1-.553.894l-4 2A1 1 0 0 1 8 21v-7.494L3.22 5.625A1 1 0 0 1 3 5V4z"/>
-          </svg>
-        </div>
-        <div class="col">Horário</div>
-        <div class="col">Atividade</div>
-        <div class="col">Tipo</div>
-        <div class="col">Local</div>
-        <div class="col">Status</div>
-      </div>
 
-      <!-- Rows -->
-      <div class="table-body">
 
-       <div class="table-row">
-<div class="cell actions hidden-actions">
+    <div class="spacePage">
+   <div class="wrapper"></div>
 
-<div class="acoes">
-  <img src="https://cdn-icons-png.flaticon.com/512/700/700291.png" class="btn-icon editar" onclick="editarLinha(this)">
-  <img src="https://img.icons8.com/ios7/600/FA5252/trash.png" class="btn-icon excluir" onclick="excluirLinha(this)">
-</div>
+   <div class="programacao-container">
 
-</div>
-  <div class="cell time">10:00AM – 10:50AM</div>
-  <div class="cell activity">Tendências de UX</div>
-  <div class="cell type">Palestra</div>
-  <div class="cell local">Planalto Branco</div>
-  <div class="cell status conflito">Verificado</div>
+  <div class="programacao-header">
 
-  <div class="details">
+    <h1>Programação geral</h1>
 
-      <div class="details-description">
-          <h3>Descrição</h3>
+    <div class="header-actions">
 
-          <p>
-              Introdução aos conceitos de Inteligência Artificial,
-              aplicações atuais e tendências do mercado.
-          </p>
+      <button class="date-btn active">26/03</button>
+      <button class="date-btn">27/03</button>
+      <button class="date-btn">28/03</button>
 
-          <h3>Responsável</h3>
+      <button class="filter-btn">
+        ☰
+      </button>
 
-          <p>Paulo Nogueira</p>
-      </div>
+    </div>
 
-      <div class="details-status">
-          <h3>Status</h3>
+  </div>
 
-          <p>
-              Verificado porque o palestrante confirmou presença
-              e os equipamentos da sala foram aprovados.
-          </p>
-      </div>
+
+  <!-- CARD -->
+  <div class="programacao-card">
+
+    <!-- HORÁRIO -->
+    <div class="horario-box">
+
+      <span>09:00</span>
+      <span>-</span>
+      <span>09:30</span>
+
+      <strong>AM</strong>
+
+    </div>
+
+
+    <!-- CONTEÚDO -->
+    <div class="programacao-content">
+
+      <h2>
+        UX & DevEx: onde o design encontra o código
+      </h2>
+
+      <h3>
+        Trilha:
+        <span>experiência</span>
+      </h3>
+
+      <p>Keynote</p>
+
+    </div>
+
+
+    <!-- BARRA AMARELA -->
+    <div class="color-bar"></div>
+
+  </div>
+<!-- CARD -->
+  <div class="programacao-card">
+
+    <!-- HORÁRIO -->
+    <div class="horario-box">
+
+      <span>09:00</span>
+      <span>-</span>
+      <span>09:30</span>
+
+      <strong>AM</strong>
+
+    </div>
+
+
+    <!-- CONTEÚDO -->
+    <div class="programacao-content">
+
+      <h2>
+        UX & DevEx: onde o design encontra o código
+      </h2>
+
+      <h3>
+        Trilha:
+        <span>experiência</span>
+      </h3>
+
+      <p>Keynote</p>
+
+    </div>
+
+
+    <!-- BARRA AMARELA -->
+    <div class="color-bar"></div>
 
   </div>
 
 </div>
 
- 
-       
-      </div>
-    </div>
+</div>
+  </section>
+
+
+  <section id="propostas" class="page">
+    <h1>Trilhas</h1>
+    <p>Conteúdo das trilhas aqui.</p>
+    <div class="spacePage">
+    <div class="overview-grid">
+
+  <div class="overview-card">
+    Card 1
   </div>
 
+  <div class="overview-card">
+    Card 2
+  </div>
 </div>
-
-<div id="formulario-area" class="hidden">
-
-<div class="container">
-
-    <form class="formulario">
-
-    <div class="campo">
-        <label>Título</label>
-
-        <input type="text"
-placeholder="Digite o título da atividade"
-maxlength="30">
-    </div>
+   </div>
+  </section>
 
 
-    <div class="campo-duplo">
+  <section id="trilhas" class="page">
+    <h1>Trilhas</h1>
+    <p>Conteúdo das trilhas aqui.</p>
+  </section>
 
-        <div class="campo">
-            <label>Tipo</label>
+  <section id="palestrantes" class="page">
+    <h1>Palestrantes</h1>
+    <p>Conteúdo dos palestrantes aqui.</p>
+  </section>
 
-            <select>
-                <option>Palestra</option>
-                <option>Workshop</option>
-                <option>Painel</option>
-                <option>Trilha</option>
-            </select>
-        </div>
+  <section id="espacos" class="page">
+    <h1>Espaços & Slots</h1>
+    <p>Conteúdo dos espaços aqui.</p>
+  </section>
 
-        <div class="campo">
-            <label>Categoria</label>
-
-            <select>
-                <option>Tecnologia</option>
-                <option>UX/UI</option>
-                <option>Inteligência Artificial</option>
-                <option>Gestão</option>
-            </select>
-        </div>
-
-    </div>
-
-    <div class="campo">
-        <label>Descrição</label>
-
-        <textarea
-placeholder="Digite a descrição"
-maxlength="100"></textarea>
-    </div>
-
-    <div class="campo">
-        <label>Responsável</label>
-
-       <input type="text"
-placeholder="Digite o responsável"
-maxlength="30">
-    </div>
-
-    <div class="campo-duplo">
-
-        <div class="campo">
-            <label>Horário</label>
-
-            <input type="time">
-        </div>
-
-        <div class="campo">
-            <label>Local</label>
-
-            <input type="text" placeholder="Digite o local">
-        </div>
-
-    </div>
-
-    <button type="submit" class="salvar-btn">
-        Salvar
-    </button>
-
-    <button type="button" class="cancelar-btn" onclick="voltarTabela()">
-    Cancelar
-</button>
-
-
-            </form>
-
-        </div>
-
-    </div>
+  <section id="ia" class="page">
+    <h1>Análise por IA</h1>
+    <p>Conteúdo da IA aqui.</p>
+  </section>
 
 </div>
-
-
 </div>
-
-  
-</div>
-
-        
-
+    
 <script>
 
-let modoEdicao = false;
+function navigate(pageId, element) {
 
-function toggleModoEdicao(){
 
-    modoEdicao = !modoEdicao;
+  const pages = document.querySelectorAll('.page');
 
-    const tabela = document.querySelector(".table-body");
+  pages.forEach(page => {
+    page.style.display = 'none';
+  });
 
-    if(modoEdicao){
-        tabela.classList.add("modo-edicao");
-    } else {
-        tabela.classList.remove("modo-edicao");
-    }
 
+  document.getElementById(pageId).style.display = 'block';
+
+
+  
+  const navItems = document.querySelectorAll('.nav-item');
+
+  navItems.forEach(item => {
+    item.classList.remove('active');
+  });
+
+
+  element.classList.add('active');
 }
 
-  /*formulário*/
-  function abrirFormulario(){
-
-    const tabela = document.getElementById("tabela-area");
-
-    const formulario = document.getElementById("formulario-area");
 
 
-    const formularioVisivel =
-    window.getComputedStyle(formulario).display !== "none";
+document.addEventListener('DOMContentLoaded', () => {
 
+  const pages = document.querySelectorAll('.page');
 
-    if(formularioVisivel){
+  pages.forEach(page => {
+    page.style.display = 'none';
+  });
 
-        formulario.style.display = "none";
-
-        tabela.style.display = "block";
-
-    } else {
-
-        tabela.style.display = "none";
-
-        formulario.style.display = "block";
-
-    }
-
-}
-/**/
-function toggleFiltros(){
-
-    const filtros =
-    document.getElementById("filtersBar");
-
-    filtros.classList.toggle("active");
-
-}
-/**/
-function voltarTabela(){
-
-    document.getElementById("tabela-area").style.display = "block";
-
-    document.getElementById("formulario-area").style.display = "none";
-
-}
-
-  /*menu*/
-function toggleMenu() {
-  document.getElementById("dropdownMenu").classList.toggle("show");
-}
-
-// Fecha o menu se clicar fora
-window.onclick = function(event) {
-  if (!event.target.closest('.dropdown')) {
-    document.getElementById("dropdownMenu").classList.remove("show");
-  }
-}
-
-const rows = document.querySelectorAll(".table-row");
-
-rows.forEach(row => {
-
-    row.addEventListener("click", () => {
-
-        const details = row.querySelector(".details");
-
-        const isVisible = window.getComputedStyle(details).display !== "none";
-
-        if(isVisible){
-            details.style.display = "none";
-        } else {
-            details.style.display = "grid";
-        }
-
-    });
+  document.getElementById('dashboard').style.display = 'block';
 
 });
+
 </script>
-
-
-
-    </body>
+  </body>
 </html>
