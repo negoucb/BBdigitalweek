@@ -1,3 +1,8 @@
+ /*
+--------------------------
+BODY
+--------------------------
+*/
  *{
       box-sizing: border-box;
     }
@@ -6,6 +11,8 @@
       background:rgba(255, 255, 255, 0);
       margin: 0;
          height: 100vh;
+         
+
   overflow:hidden;
  overflow-x: hidden;
 
@@ -21,7 +28,11 @@
 
         }
 .navbar { 
-  /* barra de navegação */
+ /*
+--------------------------
+BARRA DE NAVEGAÇÃO
+--------------------------
+*/
   background:  #465EFF;
       color: white;
   
@@ -102,7 +113,11 @@ right: 7cm;
 .dropdown-content.show {
   display: block;
 }
-/* barra de lateral */
+/*
+--------------------------
+BARRA LATERAL
+--------------------------
+*/
 
 .leftbar{ 
   background:#141D5A;
@@ -206,106 +221,217 @@ display: flex;
   display: block;
 }
 
-/*espaço central*/
+/*
+--------------------------
+ESPAÇO CENTRAL
+--------------------------
+*/
 
 .spacePage{
-padding: 2cm;
-overflow:visible;
+padding: 1.5cm;
+
+overflow:hidden;
+overflow-x: hidden;
 }
 
-/*Cards*/
+#part{
+  color: white;
+}
+/*
+--------------------------
+DASHBOARD
+--------------------------
+*/
 .title-page{
   font-size: 32px;
-  margin-bottom: 30px;
   font-weight: 600;
 }
 
-.overview-grid{
-
+.dash-grid{
   display: grid;
-
   grid-template-columns: repeat(4, 1fr);
-
-  gap: 20px;
-
-  padding-bottom:1cm ;
-
-  width: 100%;
+ gap: 20px;
+  padding-bottom: 1cm;
+  width: 99%;
 }
 
 
-.overview-card{
 
-  background: #F0F2FF;
-
-  padding: 4.5cm;
-
+.dash-card1{
+  background: white;
   border-radius: 20px;
-
+  padding: 25px;
   width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
-.overview-card:hover{
-  transform: translateY(-5px);
-}
 
 
-.card-top{
+
+.resume{
+padding-left: 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 
-.card-icon{
+.resume h2{
+  margin: 0;
+  font-size: 30px;
+  color: #465EFF;
+}
 
-  width: 55px;
-  height: 55px;
 
-  background: #465EFF;
 
-  border-radius: 15px;
+.dcard-icon{
+
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+
+
+.number-status{
 
   display: flex;
+padding-left: 20px;
   align-items: center;
-  justify-content: center;
-
-  color: white;
-
-  font-size: 24px;
-}
-
-
-.overview-card h2{
-  font-size: 18px;
-  margin-bottom: 10px;
+  gap: 25px;
+  margin-bottom: 2px;
+  flex-wrap: wrap;
 }
 
 
 .card-number{
 
-  font-size: 42px;
-
+  font-size: 70px;
   font-weight: 700;
-
-  color: #465EFF;
-
-  display: block;
-
-  margin-bottom: 10px;
+  color: #111827;
+  margin: 0;
+  line-height: 1;
 }
 
 
-.overview-card p{
-  color: #666;
+
+
+
+.status-group{
+
+  display: flex;
+  flex-direction: column;
+padding-top: 5px;
+  gap: 8px;
+}
+
+
+.status-item{
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  margin-left: 10px;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+
+
+.green{
+  color: #15803D;
+}
+
+.orange{
+  color: #B45309;
+}
+
+.red{
+  color: #B91C1C;
+}
+
+
+
+
+
+.pulse{
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  animation: pulse-animation 1.5s infinite;
+}
+
+
+.green .pulse{
+  background: #22C55E;
+}
+
+.orange .pulse{
+  background: #F59E0B;
+}
+
+.red .pulse{
+  background: #EF4444;
+}
+
+
+
+
+
+@keyframes pulse-animation{
+
+  0%{
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50%{
+    transform: scale(1.5);
+    opacity: 0.5;
+  }
+
+  100%{
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+
+
+
+
+.card-subtitle{
+
+  margin: 0;
+
+  color: #9CA3AF;
+  max-width: 5px;
   font-size: 14px;
 }
 
 
-/*tabela do cronograma*/
+.dash-card2{
 
+  background: #F0F2FF;
+  padding: 3cm;
+
+
+  border-radius: 20px;
+  overflow: hidden;
+  width: 21cm;
+}
+
+
+
+/*
+--------------------------
+TABELA CRONOGRAMA
+--------------------------
+*/
 .programacao-container{
 
   width: 160%;
@@ -429,7 +555,7 @@ right: 0;
   align-items: stretch;
 
   gap: 15px;
-  padding-bottom: 20pxw;
+  padding-bottom: 20px;
 }
 
 
@@ -471,7 +597,11 @@ right: 0;
 }
 
 
-/* CONTEÚDO */
+/*
+--------------------------
+CONTEÚDO
+--------------------------
+*/
 
 .programacao-content{
 
@@ -482,6 +612,7 @@ right: 0;
   border-radius: 25px 0 0 25px;
 
   padding: 35px;
+    border: 1px solid #9A9A9A;
 }
 
 
@@ -532,44 +663,17 @@ right: 0;
   background: #FFE100;
 
   border-radius: 0 25px 25px 0;
+  
 }
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*filtro*/
+/*
+--------------------------
+FILTRO TABELA
+--------------------------
+*/
 .filters-bar{
     display: none;
 
@@ -619,7 +723,11 @@ right: 0;
   }
 
 
-/* formulário */
+/*
+--------------------------
+FORMULÁRIO
+--------------------------
+*/
 .voltar-btn{
     background: #e5e9ff;
     border: none;
@@ -743,3 +851,4 @@ right: 0;
     font-size: 15px;
     font-weight: 600;
 }
+
