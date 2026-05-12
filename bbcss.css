@@ -214,7 +214,12 @@ display: flex;
 }
 
 .page{
-  display: none;
+  
+  height: 100vh;
+
+  overflow-y: auto;
+padding-bottom: 2cm;
+  overflow-x: hidden;
 }
 
 .active-page{
@@ -230,7 +235,7 @@ ESPAÇO CENTRAL
 .spacePage{
 padding: 1.5cm;
 
-overflow:hidden;
+
 overflow-x: hidden;
 }
 
@@ -354,6 +359,9 @@ padding-top: 5px;
   color: #B91C1C;
 }
 
+.brown{
+  color: #6b5c07;
+}
 
 
 
@@ -468,7 +476,7 @@ TABELA CRONOGRAMA
 
   justify-content: space-between;
 
-  padding: 0 40px;
+  padding: 0 px;
 
   margin-bottom: 20px;
 }
@@ -516,6 +524,7 @@ TABELA CRONOGRAMA
 }
 
 
+
 .date-btn.active{
 
   background: #121B69;
@@ -526,11 +535,11 @@ TABELA CRONOGRAMA
 
 .filter-btn{
 
-  width: 150px;
+  width: 170px;
 
   height: 100px;
  
-right: 0;
+padding-left: 2cm;;
 
   background: white;
 
@@ -850,5 +859,491 @@ FORMULÁRIO
 
     font-size: 15px;
     font-weight: 600;
+}
+
+
+/*
+--------------------------
+MINI CONTAINER
+--------------------------
+*/
+
+.mini-programacao-container{
+
+  width: 100%;
+
+  background: #ECECF2;
+
+  border-radius: 25px;
+
+  padding: 20px;
+
+  box-sizing: border-box;
+}
+
+
+
+
+.mini-programacao-header{
+
+  width: 100%;
+
+  height: 70px;
+
+  background: #465EFF;
+
+  border-radius: 18px 18px 0 0;
+
+  display: flex;
+
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding: 0 25px;
+
+  margin-bottom: 15px;
+}
+
+
+.mini-programacao-header h1{
+
+  color: white;
+
+  font-size: 20px;
+padding-right: 30px;
+  margin: 0;
+}
+
+
+
+
+.mini-header-actions{
+
+  display: flex;
+
+  gap: 10px;
+}
+
+
+.mini-date-btn{
+
+  width: 90px;
+
+  height: 40px;
+
+  border: none;
+
+  border-radius: 12px;
+
+  background: #d3d3d300;
+
+  color: #1874ff00;
+
+  font-size: 16px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+#mini2{ background: #141D5A;
+;
+
+  color: #f0f0f0;
+}
+#mini1{ 
+  background: #d3d3d3;
+
+  color: #727272}
+
+.mini-date-btn.active{
+
+  background: #0143a500;
+
+  color: rgba(255, 255, 255, 0);
+}
+
+
+
+
+.mini-scroll-area{
+
+  max-height: 350px;
+
+  overflow-y: auto;
+
+  padding-right: 5px;
+}
+
+
+
+
+.mini-programacao-card{
+
+  width: 100%;
+
+  min-height: 80px;
+
+  display: flex;
+
+  align-items: stretch;
+
+  gap: 10px;
+
+  margin-bottom: 12px;
+}
+
+
+
+
+.mini-horario-box{
+
+  width: 100px;
+
+  background: #D9D9E3;
+
+  border-radius: 18px;
+
+  border: 1px solid #9A9A9A;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  font-size: 18px;
+
+  font-weight: 700;
+}
+
+
+
+
+
+.mini-programacao-content{
+
+  flex: 1;
+
+  background: #D9D9E3;
+
+  border-radius: 18px 0 0 18px;
+
+  border: 1px solid #9A9A9A;
+
+  padding: 18px;
+
+  display: flex;
+
+  align-items: center;
+}
+
+
+.mini-programacao-content h2{
+
+  font-size: 18px;
+
+  margin: 0;
+
+  overflow-wrap: break-word;
+}
+
+
+
+.mini-color-bar{
+
+  width: 35px;
+
+  background: #FFE100;
+
+  border-radius: 0 18px 18px 0;
+}
+
+
+/*
+--------------------------
+MINI CONTAINER
+--------------------------
+*/
+
+
+.mini-conflito-box{
+
+  width: 100px;
+
+  border-radius: 18px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  font-size: 20px;
+
+  font-weight: 700;
+
+  color: white;
+}
+
+#Hconflito{
+  background-color: #160a0a;
+}
+
+
+.red-conflict{
+
+  background: #a71717;
+}
+
+
+
+.orange-conflict{
+
+  background: #f18875;
+}
+
+
+
+
+
+.red-bar{
+
+  background: #a71717;
+}
+
+.orange-bar{
+
+  background: #f18875;
+}
+
+
+
+
+.conflict-details{
+
+  margin-top: 8px;
+
+  font-size: 13px;
+
+  color: #6B7280;
+
+  line-height: 1.5;
+
+  overflow-wrap: break-word;
+}
+
+
+/*
+--------------------------
+MINI GRÁFICO
+--------------------------
+*/
+
+/* CARD */
+
+.trilha-chart-card{
+
+  width: 50%;
+
+  min-width: 490px;
+
+  background: white;
+
+  border-radius: 25px;
+
+  padding: 22px;
+
+  box-sizing: border-box;
+
+  overflow: hidden;
+}
+
+
+
+
+
+.trilha-chart-header{
+
+  margin-bottom: 22px;
+}
+
+
+.trilha-chart-header h2{
+
+  margin: 0;
+
+  font-size: 22px;
+
+  color: #111827;
+}
+
+
+.trilha-chart-header p{
+
+  margin-top: 6px;
+
+  color: #6B7280;
+
+  font-size: 13px;
+}
+
+
+
+.trilha-chart-scroll{
+
+  max-height: 420px;
+
+  overflow-y: auto;
+
+  overflow-x: hidden;
+
+  padding-right: 6px;
+}
+
+
+
+
+
+.trilha-chart-row{
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 14px;
+
+  margin-bottom: 16px;
+
+  width: 100%;
+}
+
+
+
+
+
+.trilha-chart-label{
+
+  width: 120px;
+
+  font-size: 15px;
+
+  font-weight: 600;
+
+  color: #374151;
+
+  flex-shrink: 0;
+
+  overflow-wrap: break-word;
+}
+
+
+
+
+
+.trilha-chart-bar-area{
+
+  width: 250px;
+
+  background: #ECECF2;
+
+  height: 24px;
+
+  border-radius: 999px;
+
+  overflow: hidden;
+
+  flex-shrink: 0;
+}
+
+
+
+
+
+.trilha-chart-bar{
+
+  height: 100%;
+
+  border-radius: 999px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: flex-end;
+
+  padding-right: 10px;
+
+  color: white;
+
+  font-size: 11px;
+
+  font-weight: 700;
+}
+
+
+
+
+
+.trilha-blue{
+  background: #3B82F6;
+}
+
+.trilha-purple{
+  background: #8B5CF6;
+}
+
+.trilha-green{
+  background: #22C55E;
+}
+
+.trilha-yellow{
+  background: #EAB308;
+}
+
+.trilha-red{
+  background: #EF4444;
+}
+
+.trilha-cyan{
+  background: #06B6D4;
+}
+
+.trilha-pink{
+  background: #EC4899;
+}
+
+.trilha-darkblue{
+  background: #2563EB;
+}
+mini
+.trilha-orange{
+  background: #F97316;
+}
+
+/*
+--------------------------
+ALERTAS
+-------------------------
+*/
+.alert-grid{
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+ gap: 20px;
+  padding-bottom: 1cm;
+  width: 99%;
+}
+
+
+
+.alert-card1{
+  background: white;
+  border-radius: 20px;
+  padding: 25px;
+  width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
