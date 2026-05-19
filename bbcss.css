@@ -234,10 +234,11 @@ ESPAÇO CENTRAL
 
 .spacePage{
 padding: 1.5cm;
-
-
 overflow-x: hidden;
 }
+ 
+
+
 
 #part{
 color: white;
@@ -271,7 +272,9 @@ overflow: hidden;
 box-sizing: border-box;
 }
 
-
+.conteudo{
+  padding-left: 50px;
+}
 
 
 .resume{
@@ -1362,7 +1365,7 @@ TABELA CONFLITOS
     transform: scale(0.6);
     
     transform-origin: top left;
-    
+    margin-right: 5.5cm;
     background: #ECECF2;
     
     border-radius: 30px;
@@ -1618,3 +1621,418 @@ TABELA CONFLITOS
     
     
     
+    /*
+    --------------------------
+    OUTRAS PÁGINAS
+    --------------------------
+    */
+
+.pag-flex{
+display: flex;
+}
+
+.gridp{
+display: flex;
+}
+
+    .pag-grid{
+display:grid;
+grid-template-columns: repeat(2, 3fr);
+gap: 20px;
+padding-bottom: 10px;
+width: 99%;
+}
+
+    .page-card1{
+background: white;
+border-radius: 20px;
+padding: 10px;
+width: 8cm;
+height: 6cm;
+box-sizing: border-box;
+margin-bottom: 10px;
+}
+    .page-card2{
+background: white;
+border-radius: 20px;
+padding: 10px;
+width: 8cm;
+height: 8cm;
+box-sizing: border-box;
+
+margin-bottom: 10px;
+}
+
+
+    .page-card3{
+background: rgba(255, 255, 255, 0.616);
+border-radius: 20px;
+padding: 10px;
+width: 30cm;
+height: 17cm;
+box-sizing: border-box;
+margin-bottom: 3px;
+margin-right: 5cm;
+}
+
+
+.filter-pages{
+  padding-left: 17cm;
+
+}
+
+.date-btnp{
+
+width: 70px;
+
+height: 45px;
+
+border-radius: 20px;
+
+border: none;
+
+background: #F1F1F1;
+
+color: #7B7B7B;
+
+font-size: 20px;
+
+font-weight: 700;
+
+cursor: pointer;
+}
+
+
+
+.date-btnp.active{
+
+background: #192ee6;
+
+color: white;
+}
+
+
+.search-btnp{
+
+width: 170px;
+
+height: 60px;
+
+
+background:#e4e000;
+
+border-radius: 70px;
+
+font-size: 20px;
+
+cursor: pointer;
+
+color: #000000;
+}
+
+
+.ce-btnp{
+
+width: 170px;
+
+height: 60px;
+
+
+background:#182ffd;
+
+border-radius: 70px;
+
+font-size: 20px;
+
+cursor: pointer;
+
+color: #ffffff;
+}
+
+
+.resume2{
+padding-left: 10px;
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 5px;
+}
+
+
+.resume2 h2{
+margin: 0;
+font-size: 25px;
+color: #465EFF;
+}
+
+
+
+.pcard-icon{
+
+width: 40px;
+height: 50px;
+object-fit:contain;
+padding-left: 10px;
+}
+
+
+
+.pnumber-status{
+
+display: flex;
+padding-left: 20px;
+align-items: center;
+gap: 25px;
+margin-bottom: 20px;
+flex-wrap: wrap;
+}
+
+
+.pcard-number{
+
+font-size: 90px;
+font-weight: 700;
+color: #111827;
+margin: 0;
+line-height: 1;
+}
+
+.pcard-subtitle{
+
+margin: 0;
+
+color: #9CA3AF;
+max-width: 50px;
+font-size: 14px;
+}
+#status{
+ 
+margin-left: 20px;
+color: #9CA3AF;
+max-width: 150px;
+font-size: 14px;
+}
+
+
+.status h2{
+margin: 0;
+font-size: 30px;
+color: #242424;
+}
+ 
+.status{
+padding-left: 10px;
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 10px;
+}
+
+.status-number{
+
+font-size: 90px;
+font-weight: 700;
+color: #111827;
+margin: 0;
+line-height: 1;
+}
+
+.spacePage2{
+padding-left: 2cm;
+padding-top: 1cm;
+overflow-x:auto;
+}
+ 
+.card-list{
+  padding: 20px;
+
+}
+
+.pales-list{
+  padding: 20px;
+}
+
+.slot-list{
+  padding: 20px;
+}
+
+.below-btn{
+  margin-left: 10cm;
+}
+
+
+.status-page{
+
+display: flex;
+flex-direction: column;
+padding-top: 5px;
+gap: 8px;
+}
+
+
+.statusp-item{
+
+display: flex;
+align-items: center;
+gap: 8px;
+padding: 6px 12px;
+margin-left: 10px;
+border-radius: 999px;
+font-size: 30px;
+font-weight: 600;
+}
+
+
+
+.green{
+color: #15803D;
+}
+
+.orange{
+color: #B45309;
+}
+
+.red{
+color: #B91C1C;
+}
+
+.brown{
+color: #6b5c07;
+}
+
+
+
+
+.pulse{
+width: 10px;
+height: 10px;
+border-radius: 50%;
+animation: pulse-animation 1.5s infinite;
+}
+
+
+.green .pulse{
+background: #22C55E;
+}
+
+.orange .pulse{
+background: #F59E0B;
+}
+
+.red .pulse{
+background: #EF4444;
+}
+
+
+
+
+
+@keyframes pulse-animation{
+
+0%{
+  transform: scale(1);
+  opacity: 1;
+}
+
+50%{
+  transform: scale(1.5);
+  opacity: 0.5;
+}
+
+100%{
+  transform: scale(1);
+  opacity: 1;
+}
+}
+
+
+
+    /*
+    --------------------------
+    ATIVIDADES
+    --------------------------
+    */
+.card-evento{
+    width: 340px;
+    height: 168px;
+
+    background: #E8E8F2;
+
+    border: 2px solid #9A9A9A;
+    border-radius: 28px;
+
+    overflow: hidden;
+
+    display: flex;
+
+    font-family: 'Poppins', sans-serif;
+}
+
+.card-info{
+    flex: 1;
+
+    padding: 28px 24px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    overflow: hidden;
+}
+
+.card-titulo{
+    font-size: 24px;
+    font-weight: 700;
+
+    color: black;
+
+    margin-bottom: 2px;
+
+        word-break: break-word;
+    overflow-wrap: break-word;
+    line-height: 1;
+}
+
+.card-trilha{
+    font-size: 14px;
+    font-weight: 600;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    color: #6B6B6B;
+
+    margin-bottom: 10px;
+}
+
+.card-horario{
+    font-size: 12px;
+    font-weight: 700;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    color: #1D1D1D;
+}
+
+.card-status{
+    width: 70px;
+
+    background: #FFE11A;
+
+    border-left: 2px solid #9A9A9A;
+
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+
+    padding-top: 36px;
+}
+
+/* BOLA VERDE */
+.status-bola{
+    width: 28px;
+    height: 28px;
+    margin-right: 15px;
+    margin-top: 30px;
+    background: #00A12A;
+
+    border-radius: 50%;
+}
+
