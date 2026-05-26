@@ -14,7 +14,7 @@ BODY
        
 
 overflow:hidden;
-overflow-x: hidden;
+
 
    min-height: 100vh;
 
@@ -65,8 +65,32 @@ width: 1cm;
 right: 7cm;
  
 
+
+
 }
 
+    .letreiro{
+      display: flex;
+      align-items: center;
+      gap: 25px;
+      margin-left: 1cm;
+    }
+
+    .barra{
+      width: 2px;
+      height: 50px;
+      background: white;
+      border-radius: 10px;
+    }
+
+    .texto{
+      color: #FFD700;
+      font-size: 20px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 5px;
+    
+    }
 
 .dropmenu {
 display: flex;
@@ -217,9 +241,9 @@ padding: 30px;
 
 height: 100vh;
 
-overflow-y: auto;
+
 padding-bottom: 2cm;
-overflow-x: hidden;
+overflow: hidden;
 }
 
 .active-page{
@@ -234,7 +258,7 @@ ESPAÇO CENTRAL
 
 .spacePage{
 padding: 1.5cm;
-overflow-x: hidden;
+overflow: hidden;
 }
  
 
@@ -260,6 +284,11 @@ gap: 20px;
 padding-bottom: 1cm;
 width: 99%;
 }
+
+
+
+
+
 
 
 
@@ -436,307 +465,503 @@ overflow: hidden;
 width: 21cm;
 }
 
-
-
 /*
 --------------------------
-TABELA CRONOGRAMA
+CRONOMETRO
 --------------------------
 */
-.programacao-container{
+/* =========================================
+CONTAINER
+========================================= */
 
-width: 160%;
+.agenda-master-box{
 
-transform: scale(0.6);
+    width: 40cm;
 
-transform-origin: top left;
+    min-height: 70vh;
 
-background: #ECECF2;
+    background: linear-gradient(
+        180deg,
+        #F7F8FC 0%,
+        #ECEEF7 100%
+    );
 
-border-radius: 30px;
+    border-radius: 38px;
 
-padding: 40px;
+    padding: 34px;
 
-font-family: 'Poppins', sans-serif;
+    overflow: auto;
+margin-left: 1.5cm;
+    box-shadow:
+        0 20px 60px rgba(15,23,42,0.08);
+
+    font-family: 'Poppins', sans-serif;
 }
 
 
 
+/* =========================================
+HEADER
+========================================= */
 
-.programacao-header{
+.agenda-topbar{
 
-width: 100%;
+    width: 100%;
 
-height: 100px;
+    min-height: 120px;
 
-background: #465EFF;
+    background: linear-gradient(
+        135deg,
+        #465EFF 0%,
+        #3147DA 100%
+    );
 
-border-radius: 20px 20px 0 0;
+    border-radius: 30px;
 
-display: flex;
+    padding: 28px 34px;
 
-align-items: center;
+    display: flex;
 
-justify-content: space-between;
+    align-items: center;
 
-padding: 0 px;
+    justify-content: space-between;
 
-margin-bottom: 20px;
+    margin-bottom: 28px;
 }
 
 
-.programacao-header h1{
+.agenda-top-left{
 
-color: white;
+    display: flex;
 
-font-size: 55px;
+    align-items: center;
 
-font-weight: 700;
+    gap: 18px;
 }
 
 
-.header-actions{
+.agenda-main-title{
 
-display: flex;
+    color: white;
 
-align-items: center;
+    font-size: 40px;
 
-gap: 10px;
-}
+    font-weight: 700;
 
-
-.date-btn{
-
-width: 120px;
-
-height: 60px;
-
-border-radius: 20px;
-
-border: none;
-
-background: #F1F1F1;
-
-color: #7B7B7B;
-
-font-size: 28px;
-
-font-weight: 700;
-
-cursor: pointer;
+    margin: 0;
 }
 
 
 
-.date-btn.active{
+/* DATAS */
+.agenda-date-group{
 
-background: #121B69;
+    display: flex;
 
-color: white;
+    gap: 14px;
 }
 
 
-.filter-btn{
+.agenda-date-chip{
 
-width: 170px;
+    height: 52px;
 
-height: 100px;
+    padding: 0 24px;
 
-padding-left: 2cm;;
+    border: none;
 
-background: white;
+    border-radius: 18px;
 
-border-radius: 0 0 0 100px;
+    background: rgba(255,255,255,0.15);
 
-font-size: 40px;
+    color: white;
 
-cursor: pointer;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: .25s;
 }
 
 
+.agenda-date-chip.active{
 
+    background: white;
 
-.programacao-card{
-
-width: 100%;
-
-min-height: 220px;
-
-display: flex;
-
-align-items: stretch;
-
-gap: 15px;
-padding-bottom: 20px;
+    color: #465EFF;
 }
 
 
 
+/* FILTRO BTN */
+.agenda-filter-toggle{
 
-.horario-box{
+    height: 54px;
 
-width: 300px;
+    padding: 0 24px;
 
-background: #D9D9E3;
+    border: none;
 
-border-radius: 25px;
+    border-radius: 18px;
 
-border: 1px solid #9A9A9A;
+    background: white;
 
-display: flex;
+    color: #465EFF;
 
-flex-direction: column;
+    font-weight: 700;
 
-align-items: center;
+    display: flex;
 
-justify-content: center;
+    align-items: center;
 
-font-size: 34px;
+    gap: 10px;
 
-font-weight: 700;
-
-color: black;
-}
-
-
-.horario-box strong{
-
-margin-top: 20px;
-
-font-size: 38px;
-
-color: #33333B;
-}
-
-
-/*
---------------------------
-CONTEÚDO
---------------------------
-*/
-
-.programacao-content{
-
-flex: 1;
-
-background: #D9D9E3;
-
-border-radius: 25px 0 0 25px;
-
-padding: 35px;
-  border: 1px solid #9A9A9A;
-}
-
-
-.programacao-content h2{
-
-font-size: 48px;
-
-margin-bottom: 20px;
-
-font-weight: 700;
-
-color: black;
-}
-
-
-.programacao-content h3{
-
-font-size: 34px;
-
-color: #4A4A4A;
-
-margin-bottom: 20px;
-}
-
-
-.programacao-content h3 span{
-
-color: #7B7B7B;
-}
-
-
-.programacao-content p{
-
-font-size: 38px;
-
-font-weight: 700;
-
-color: #3E3E47;
+    cursor: pointer;
 }
 
 
 
+/* =========================================
+FILTROS
+========================================= */
 
-.color-bar{
+.agenda-filters-panel{
 
-width: 120px;
+    display: none;
 
-background: #FFE100;
+    grid-template-columns: repeat(auto-fit, minmax(180px,1fr));
 
-border-radius: 0 25px 25px 0;
+    gap: 16px;
 
+    background: white;
+
+    padding: 24px;
+
+    border-radius: 28px;
+
+    margin-bottom: 28px;
+}
+
+
+.agenda-filters-panel.active{
+
+    display: grid;
+}
+
+
+.agenda-select,
+.agenda-input{
+
+    height: 56px;
+
+    border-radius: 18px;
+
+    border: 2px solid #E4E8F5;
+
+    background: #F8FAFF;
+
+    padding: 0 18px;
+
+    font-family: 'Poppins', sans-serif;
+
+    outline: none;
 }
 
 
 
+/* =========================================
+SCROLL
+========================================= */
 
-/*
---------------------------
-FILTRO TABELA
---------------------------
-*/
-.filters-bar{
-  display: none;
+.agenda-scroll-zone{
 
-  grid-template-columns: repeat(5, 1fr);
+    display: flex;
 
-  gap: 16px;
+    flex-direction: column;
 
-  background: #f56d93;
+    gap: 24px;
 
-  padding: 24px;
+    max-height: 72vh;
 
-  border-radius: 30px 30px 0 0;
-
-  margin-bottom: -10px;
-
-  animation: aparecer 0.2s ease;
-  
-}
-
-.filters-bar input,
-.filters-bar select{
-  padding: 14px;
-
-  border: none;
-
-  border-radius: 12px;
-
-  font-size: 14px;
-
-  outline: none;
-}
-
-.filters-bar.active{
-  display: grid;
-}
-@keyframes aparecer{
-
-  from{
-      opacity: 0;
-      transform: translateY(-10px);
-  }
-
-  to{
-      opacity: 1;
-      transform: translateY(0);
-  }
+    overflow-y: auto;
 }
 
 
-/*
---------------------------
+
+/* =========================================
+LINHAS
+========================================= */
+
+.agenda-row{
+
+    display: flex;
+
+    gap: 24px;
+}
+
+
+
+/* HORÁRIO */
+.agenda-time-box{
+
+    width: 130px;
+
+    min-height: 168px;
+
+    border-radius: 30px;
+
+    background: linear-gradient(
+        180deg,
+        #465EFF 0%,
+        #3147DA 100%
+    );
+
+    color: white;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 28px;
+
+    font-weight: 700;
+
+    flex-shrink: 0;
+}
+
+
+
+/* EVENTOS */
+.agenda-events-track{
+
+    flex: 1;
+
+    display: flex;
+
+    gap: 18px;
+
+    overflow-x: auto;
+
+    padding-bottom: 8px;
+}
+
+
+
+/* =========================================
+CARD EVENTO
+========================================= */
+
+.evento-card-plus{
+
+    width: 420px;
+
+    height: 168px;
+
+    background: #F8FAFC;
+
+    border: 2px solid #E2E8F0;
+
+    border-radius: 28px;
+
+    position: relative;
+
+    overflow: hidden;
+
+    flex-shrink: 0;
+
+    transition: .25s ease;
+
+    cursor: pointer;
+}
+
+
+.evento-card-plus:hover{
+
+    transform: translateY(-4px);
+
+    box-shadow:
+        0 14px 30px rgba(0,0,0,0.10);
+}
+
+
+
+/* FAIXA */
+.evento-card-plus::after{
+
+    content: "";
+
+    position: absolute;
+
+    right: 0;
+    top: 0;
+padding-right: 30px;
+    width: 10px;
+    height: 100%;
+}
+
+
+
+/* CORES */
+.trilha-roxa::after{
+    background: #A855F7;
+}
+
+.trilha-vermelha::after{
+    background: #EF4444;
+}
+
+.trilha-ciano::after{
+    background: #06B6D4;
+}
+
+.trilha-amarela::after{
+    background: #FACC15;
+}
+
+.trilha-laranja::after{
+    background: #F97316;
+}
+
+.trilha-verde::after{
+    background: #22C55E;
+}
+
+
+
+/* INFO */
+.evento-card-content{
+
+    padding: 26px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    height: 100%;
+}
+
+
+.evento-card-title{
+
+    font-size: 23px;
+
+    font-weight: 700;
+
+    color: #111827;
+
+    line-height: 1.1;
+
+    margin-bottom: 10px;
+}
+
+
+.evento-card-track{
+
+    font-size: 14px;
+
+    color: #64748B;
+
+    margin-bottom: 12px;
+
+    font-weight: 600;
+}
+
+
+.evento-card-info{
+
+    font-size: 13px;
+
+    color: #334155;
+
+    font-weight: 700;
+}
+
+
+
+/* =========================================
+STATUS
+========================================= */
+
+.evento-status-dot{
+
+    width: 24px;
+    height: 24px;
+
+    border-radius: 50%;
+
+    background: #00D26A;
+
+    position: absolute;
+
+    top: 34px;
+    right:50px;
+
+    animation: pulseAgenda 1.8s infinite;
+}
+
+
+.evento-status-dot::before{
+
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    border-radius: 50%;
+
+    background: inherit;
+
+    animation: pulseAgendaRing 1.8s infinite;
+
+    opacity: .6;
+}
+
+
+
+/* =========================================
+ANIMAÇÕES
+========================================= */
+
+@keyframes pulseAgendaRing{
+
+    0%{
+        transform: scale(1);
+        opacity: .7;
+    }
+
+    70%{
+        transform: scale(2.2);
+        opacity: 0;
+    }
+
+    100%{
+        opacity: 0;
+    }
+}
+
+
+@keyframes pulseAgenda{
+
+    0%{
+        transform: scale(1);
+    }
+
+    50%{
+        transform: scale(1.08);
+    }
+
+    100%{
+        transform: scale(1);
+    }
+}
+
+
+/*--------------------------
 FORMULÁRIO
 --------------------------
 */
@@ -1627,6 +1852,60 @@ TABELA CONFLITOS
     --------------------------
     */
 
+.buscar-container{
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 18px;
+    background: #F0F2FF;
+    border: 1px solid #B8BDD8;
+    border-radius: 18px;
+    width: fit-content;
+    margin-right: 1cm;
+}
+
+
+.buscar-select{
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.buscar-select label{
+    font-size: 14px;
+    font-weight: 600;
+    color: #3A3A3A;
+}
+
+.buscar-select select{
+    width: 180px;
+    height: 42px;
+
+    border: 1px solid #C6CAE2;
+    border-radius: 12px;
+    padding: 0 12px;
+    font-size: 14px;
+
+    background: white;
+
+    outline: none;
+}
+
+
+.buscar-input input{
+    width: 220px;
+    height: 42px;
+
+    border: 1px solid #C6CAE2;
+    border-radius: 12px;
+
+    padding: 0 14px;
+
+    font-size: 14px;
+
+    outline: none;
+}
+
 .pag-flex{
 display: flex;
 }
@@ -1673,12 +1952,14 @@ height: 17cm;
 box-sizing: border-box;
 margin-bottom: 3px;
 margin-right: 5cm;
+overflow-y:auto ;
 }
 
 
 .filter-pages{
-  padding-left: 17cm;
-
+ padding-left: 4cm;
+display: flex;
+align-items: center;
 }
 
 .date-btnp{
@@ -1687,13 +1968,13 @@ width: 70px;
 
 height: 45px;
 
-border-radius: 20px;
+border-radius: 10px;
 
 border: none;
 
-background: #F1F1F1;
+background: #494949;
 
-color: #7B7B7B;
+color: #d1d1d1;
 
 font-size: 20px;
 
@@ -1712,41 +1993,18 @@ color: white;
 }
 
 
-.search-btnp{
 
-width: 170px;
-
-height: 60px;
-
-
-background:#e4e000;
-
-border-radius: 70px;
-
-font-size: 20px;
-
-cursor: pointer;
-
-color: #000000;
-}
 
 
 .ce-btnp{
 
 width: 170px;
-
 height: 60px;
-
-
-background:#182ffd;
-
-border-radius: 70px;
-
+background:#4053ff;
+border-radius: 20px;
 font-size: 20px;
-
-cursor: pointer;
-
 color: #ffffff;
+border: none;
 }
 
 
@@ -1845,7 +2103,7 @@ overflow-x:auto;
  
 .card-list{
   padding: 20px;
-
+display: flex;
 }
 
 .pales-list{
@@ -1949,25 +2207,72 @@ background: #EF4444;
 
     /*
     --------------------------
-    ATIVIDADES
+    SESSÕES
     --------------------------
     */
 .card-evento{
     width: 340px;
     height: 168px;
 
-    background: #E8E8F2;
+    background: white;
 
-    border: 2px solid #9A9A9A;
     border-radius: 28px;
 
     overflow: hidden;
 
     display: flex;
 
+    position: relative;
+
+    transition: 0.25s ease;
+    cursor: pointer;
+
     font-family: 'Poppins', sans-serif;
+ 
+    align-items: stretch;
+
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
 }
 
+/* EFEITO HOVER */
+.card-evento:hover{
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+}
+
+/* BARRA LATERAL DA TRILHA */
+.card-evento::after{
+    content: "";
+padding-right: 30px;
+    position: absolute;
+
+    right: 0;
+    top: 0;
+
+    width: 10px;
+    height: 100%;
+
+    background: #8B5CF6;
+}
+
+/* CORES DAS TRILHAS */
+.trilha-ux::after{
+    background: #8B5CF6;
+}
+
+.trilha-tech::after{
+    background: #2563EB;
+}
+
+.trilha-ia::after{
+    background: #06B6D4;
+}
+
+.trilha-gestao::after{
+    background: #F59E0B;
+}
+
+/* ÁREA DE INFORMAÇÕES */
 .card-info{
     flex: 1;
 
@@ -1980,17 +2285,420 @@ background: #EF4444;
     overflow: hidden;
 }
 
+/* TÍTULO */
 .card-titulo{
     font-size: 24px;
     font-weight: 700;
 
-    color: black;
+    color: #1E1E1E;
 
-    margin-bottom: 2px;
+    margin-bottom: 6px;
 
-        word-break: break-word;
+    word-break: break-word;
     overflow-wrap: break-word;
-    line-height: 1;
+
+    line-height: 1.1;
+}
+
+/* TRILHA */
+.card-trilha{
+    font-size: 14px;
+    font-weight: 600;
+
+    color: #666666;
+
+    margin-bottom: 14px;
+
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+/* HORÁRIO */
+.card-horario{
+    font-size: 13px;
+    font-weight: 700;
+
+    color: #2A2A2A;
+
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+/* ÁREA DIREITA */
+.card-status{
+    width: 70px;
+
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+
+    padding-top: 34px;
+
+    position: relative;
+}
+
+/* BOLINHA */
+.status-bola-evento{
+    width: 18px;
+    height: 18px;
+
+    background: #00D26A;
+
+    border-radius: 50%;
+
+    margin-top: 30px;
+  margin-right: 60px;
+ 
+
+    animation: pulseStatus 1.8s infinite;
+}
+
+/* EFEITO PULSANTE */
+.status-bola-evento::before{
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    border-radius: 50%;
+
+    background: inherit;
+
+    animation: pulseRing 1.8s infinite;
+
+    opacity: 0.6;
+}
+
+/* ANIMAÇÃO */
+@keyframes pulseRing{
+    0%{
+        transform: scale(1);
+        opacity: 0.7;
+    }
+
+    70%{
+        transform: scale(2.2);
+        opacity: 0;
+    }
+
+    100%{
+        opacity: 0;
+    }
+}
+
+@keyframes pulseStatus{
+    0%{
+        transform: scale(1);
+    }
+
+    50%{
+        transform: scale(1.08);
+    }
+
+    100%{
+        transform: scale(1);
+    }
+}
+
+
+    /*
+    --------------------------
+    ATIVIDADES, HORÁRIOS E ESPAÇO
+    --------------------------
+    */
+
+
+.mini-table-card{
+    width: 100%;
+    min-height: 70px;
+
+    background: white;
+    border-radius: 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 28px;
+
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+
+    transition: 0.25s;
+    cursor: pointer;
+
+    position: relative;
+    overflow: hidden;
+}
+
+.mini-table-card:hover{
+    transform: translateY(-2px);
+}
+
+/* BARRA LATERAL DA TRILHA */
+.mini-table-card::after{
+    content: "";
+
+    position: absolute;
+
+    right: 0;
+    top: 0;
+
+    width: 20px;
+    height: 100%;
+
+    background: #465EFF;
+}
+
+/* CORES DAS TRILHAS */
+.trilha-ux::after{
+    background: #8B5CF6;
+}
+
+.trilha-tech::after{
+    background: #2563EB;
+}
+
+.trilha-ia::after{
+    background: #06B6D4;
+}
+
+.trilha-gestao::after{
+    background: #F59E0B;
+}
+
+/* NOME */
+.mini-card-nome{
+    font-size: 18px;
+    font-weight: 600;
+    color: #1E1E1E;
+
+    width: 40%;
+}
+
+/* ÍCONE */
+.mini-card-icone{
+    width: 20%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.mini-card-icone img{
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+}
+
+/* STATUS */
+.mini-card-status{
+    width: 20%;
+
+    display: flex;
+    justify-content: flex-end;
+padding-right: 30px;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+/* STATUS */
+.mini-card-status.ativo{
+    color: #1FA750;
+}
+
+.mini-card-status.pendente{
+    color: #E6A700;
+}
+
+.mini-card-status.cancelado{
+    color: #D92D20;
+}
+
+    /*
+    --------------------------
+   TRILHAS
+    --------------------------
+    */
+/* CARD */
+.progress-card{
+    width: 100%;
+    min-height: 120px;
+
+    background: white;
+
+    border-radius: 22px;
+
+    padding: 24px;
+
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+
+    position: relative;
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    gap: 16px;
+
+    transition: 0.25s;
+    cursor: pointer;
+}
+
+.progress-card:hover{
+    transform: translateY(-3px);
+}
+
+/* BARRA LATERAL DA TRILHA */
+.progress-card::after{
+    content: "";
+
+    position: absolute;
+
+    right: 0;
+    top: 0;
+
+    width: 30px;
+    height: 100%;
+}
+
+/* CORES DAS TRILHAS */
+.trilha-ux::after{
+    background: #8B5CF6;
+}
+
+.trilha-tech::after{
+    background: #2563EB;
+}
+
+.trilha-ia::after{
+    background: #06B6D4;
+}
+
+.trilha-gestao::after{
+    background: #F59E0B;
+}
+
+/* TÍTULO */
+.progress-card-titulo{
+    font-size: 22px;
+    font-weight: 600;
+
+    color: #1E1E1E;
+
+    margin: 0;
+}
+
+/* TEXTO */
+.progress-info{
+    font-size: 15px;
+    font-weight: 500;
+
+    color: #666;
+}
+
+/* FUNDO DA BARRA */
+.progress-bar-container{
+    width: 80%;
+    height: 14px;
+
+    background: #bdbdbd;
+
+    border-radius: 999px;
+
+    overflow: hidden;
+}
+
+/* BARRA DE PROGRESSO */
+.progress-bar{
+    height: 100%;
+    border-radius: 999px;
+}
+
+/* CORES DA BARRA */
+.trilha-ux .progress-bar{
+    background: #8B5CF6;
+}
+
+.trilha-tech .progress-bar{
+    background: #2563EB;
+}
+
+.trilha-ia .progress-bar{
+    background: #06B6D4;
+}
+
+.trilha-gestao .progress-bar{
+    background: #F59E0B;
+}
+
+/* PORCENTAGENS */
+.preenchimento-25{
+    width: 25%;
+}
+
+.preenchimento-50{
+    width: 50%;
+}
+
+.preenchimento-66{
+    width: 66%;
+}
+
+.preenchimento-80{
+    width: 80%;
+}
+
+.preenchimento-100{
+    width: 100%;
+}
+
+     /*
+    --------------------------
+    PALESTRANTES
+    --------------------------
+    */
+    .card-palestrante{
+    width: 340px;
+    height: 500px;
+    background: #E8E8F2;
+    border: 2px solid #9A9A9A;
+    border-radius: 28px;
+    overflow: hidden;
+    align-items: center;
+    gap: 15px;
+    display: grid;
+    font-family: 'Poppins', sans-serif;
+}
+
+
+    .foto-p{
+    width: 250px;
+    height: 300px;
+
+    background: #8080ff;
+
+   border: none;
+    border-radius: 28px;
+    margin: 20px;
+    
+    overflow: hidden;
+margin-left: 1cm;
+    display: flex;
+
+    font-family: 'Poppins', sans-serif;
+}
+
+.card-infop{
+
+    padding: 28px 24px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    overflow: hidden;
 }
 
 .card-trilha{
@@ -2036,3 +2744,829 @@ background: #EF4444;
     border-radius: 50%;
 }
 
+/*
+
+/* CONTAINER */
+
+.timeline-board{
+
+  width: 85%;
+
+  background: #ECECF2;
+
+  border-radius: 30px;
+
+  padding: 22px;
+
+  box-sizing: border-box;
+
+  overflow: hidden;
+}
+
+
+
+/* TOPO */
+
+.timeline-top{
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  margin-bottom: 22px;
+
+  gap: 18px;
+
+  flex-wrap: wrap;
+}
+
+
+.timeline-top h1{
+
+  margin: 0;
+
+  font-size: 28px;
+
+  color: #111827;
+}
+
+
+.timeline-top p{
+
+  margin-top: 5px;
+
+  color: #6B7280;
+
+  font-size: 13px;
+}
+
+
+
+/* BOTÕES */
+
+.timeline-days{
+
+  display: flex;
+
+  gap: 8px;
+
+  flex-wrap: wrap;
+}
+
+
+.timeline-day{
+
+  padding: 10px 16px;
+
+  border: none;
+
+  border-radius: 12px;
+
+  background: white;
+
+  color: #4B5563;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  font-size: 13px;
+}
+
+
+.timeline-day.active{
+
+  background: #465EFF;
+
+  color: white;
+}
+
+
+
+
+
+--------------------------
+TABELA CRONOGRAMA
+--------------------------
+*/
+.programacao-container{
+
+width: 160%;
+
+transform: scale(0.6);
+
+transform-origin: top left;
+
+background: #ECECF2;
+
+border-radius: 30px;
+
+padding: 40px;
+
+font-family: 'Poppins', sans-serif;
+}
+
+
+
+
+.programacao-header{
+
+width: 100%;
+
+height: 100px;
+
+background: #465EFF;
+
+border-radius: 20px 20px 0 0;
+
+display: flex;
+
+align-items: center;
+
+justify-content: space-between;
+
+padding: 0 px;
+
+margin-bottom: 20px;
+}
+
+
+.programacao-header h1{
+
+color: white;
+
+font-size: 55px;
+
+font-weight: 700;
+}
+
+
+.header-actions{
+
+display: flex;
+
+align-items: center;
+
+gap: 10px;
+}
+
+
+.date-btn{
+
+width: 120px;
+
+height: 60px;
+
+border-radius: 20px;
+
+border: none;
+
+background: #F1F1F1;
+
+color: #7B7B7B;
+
+font-size: 28px;
+
+font-weight: 700;
+
+cursor: pointer;
+}
+
+
+
+.date-btn.active{
+
+background: #121B69;
+
+color: white;
+}
+
+
+.filter-btn{
+
+width: 170px;
+
+height: 100px;
+
+padding-left: 2cm;;
+
+background: white;
+
+border-radius: 0 0 0 100px;
+
+font-size: 40px;
+
+cursor: pointer;
+}
+
+
+
+
+.programacao-card{
+
+width: 100%;
+
+min-height: 220px;
+
+display: flex;
+
+align-items: stretch;
+
+gap: 15px;
+padding-bottom: 20px;
+}
+
+
+
+
+.horario-box{
+
+width: 300px;
+
+background: #D9D9E3;
+
+border-radius: 25px;
+
+border: 1px solid #9A9A9A;
+
+display: flex;
+
+flex-direction: column;
+
+align-items: center;
+
+justify-content: center;
+
+font-size: 34px;
+
+font-weight: 700;
+
+color: black;
+}
+
+
+.horario-box strong{
+
+margin-top: 20px;
+
+font-size: 38px;
+
+color: #33333B;
+}
+
+
+/*
+--------------------------
+CONTEÚDO
+--------------------------
+*/
+
+.programacao-content{
+
+flex: 1;
+
+background: #D9D9E3;
+
+border-radius: 25px 0 0 25px;
+
+padding: 35px;
+  border: 1px solid #9A9A9A;
+}
+
+
+.programacao-content h2{
+
+font-size: 48px;
+
+margin-bottom: 20px;
+
+font-weight: 700;
+
+color: black;
+}
+
+
+.programacao-content h3{
+
+font-size: 34px;
+
+color: #4A4A4A;
+
+margin-bottom: 20px;
+}
+
+
+.programacao-content h3 span{
+
+color: #7B7B7B;
+}
+
+
+.programacao-content p{
+
+font-size: 38px;
+
+font-weight: 700;
+
+color: #3E3E47;
+}
+
+
+
+
+.color-bar{
+
+width: 120px;
+
+background: #FFE100;
+
+border-radius: 0 25px 25px 0;
+
+}
+
+
+
+
+/*
+--------------------------
+FILTRO TABELA
+--------------------------
+*/
+.filters-bar{
+  display: none;
+
+  grid-template-columns: repeat(5, 1fr);
+
+  gap: 16px;
+
+  background: #f56d93;
+
+  padding: 24px;
+
+  border-radius: 30px 30px 0 0;
+
+  margin-bottom: -10px;
+
+  animation: aparecer 0.2s ease;
+  
+}
+
+.filters-bar input,
+.filters-bar select{
+  padding: 14px;
+
+  border: none;
+
+  border-radius: 12px;
+
+  font-size: 14px;
+
+  outline: none;
+}
+
+.filters-bar.active{
+  display: grid;
+}
+@keyframes aparecer{
+
+  from{
+      opacity: 0;
+      transform: translateY(-10px);
+  }
+
+  to{
+      opacity: 1;
+      transform: translateY(0);
+  }
+}
+
+/*
+------------------------------------------------
+---------------------------------------------------
+---------------------------------------------------
+
+
+
+Pop up formulario*/
+
+
+
+/* BOTÃO */
+.ce-btnp{
+    width: 180px;
+    height: 48px;
+
+    border: none;
+    border-radius: 12px;
+
+    background: #4B5FFF;
+
+    color: white;
+
+    font-size: 16px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+/* OVERLAY */
+.overlay{
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    background: rgba(0,0,0,0.20);
+
+    backdrop-filter: blur(6px);
+
+    z-index: 998;
+
+    display: none;
+}
+
+/* POPUP */
+.popup-form{
+    position: fixed;
+
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+
+    width: 500px;
+    height: 680px;
+
+    background: #ECECEC;
+
+    border-radius: 14px;
+
+    overflow: hidden;
+
+    display: none;
+
+    z-index: 999;
+
+    font-family: 'Poppins', sans-serif;
+}
+
+/* LATERAL AZUL */
+.popup-lateral{
+    position: absolute;
+
+    right: 0;
+    top: 0;
+
+    width: 30px;
+    height: 100%;
+
+    background: #151B74;
+}
+
+/* CONTEÚDO */
+.popup-conteudo{
+    padding: 24px;
+
+    padding-right: 55px;
+
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+}
+
+/* TOPO */
+.popup-topo{
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 10px;
+}
+
+.popup-topo h2{
+    color: #4B5FFF;
+
+    font-size: 28px;
+    font-weight: 700;
+}
+
+/* BOTÃO + */
+.btn-add{
+    width: 32px;
+    height: 32px;
+
+    border-radius: 50%;
+
+    border: 2px solid #4B5FFF;
+
+    background: transparent;
+
+    color: #4B5FFF;
+
+    font-size: 22px;
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+/* CAMPOS */
+.campo-popup{
+    display: flex;
+    flex-direction: column;
+
+    margin-top: 20px;
+}
+
+.campo-popup label{
+    font-size: 14px;
+    font-weight: 600;
+
+    margin-bottom: 6px;
+}
+
+.campo-popup input,
+.campo-popup textarea{
+    border: 1px solid #B5B5B5;
+
+    border-radius: 10px;
+
+    padding: 12px;
+
+    background: white;
+
+    outline: none;
+
+    font-size: 15px;
+}
+
+.campo-popup textarea{
+    resize: none;
+
+    height: 90px;
+}
+
+.campo-popup.pequeno input{
+    width: 80px;
+}
+
+/* BOTÕES */
+.popup-botoes{
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 12px;
+
+    margin-top: auto;
+
+    padding-top: 30px;
+}
+
+.cancelar-btn{
+    background: #151B74;
+
+    color: white;
+
+    border: none;
+
+    border-radius: 6px;
+
+    padding: 8px 16px;
+
+    cursor: pointer;
+}
+
+.salvar-btn{
+    background: #4B5FFF;
+
+    color: white;
+
+    border: none;
+
+    border-radius: 6px;
+
+    padding: 8px 16px;
+
+    cursor: pointer;
+}
+/*********************************
+ POP UP SLOT
+********************************/
+
+/* OVERLAY */
+.popup-card-overlay{
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(0,0,0,0.30);
+
+    backdrop-filter: blur(6px);
+
+    display: none;
+
+    justify-content: center;
+    align-items: center;
+
+    z-index: 999;
+}
+
+/* CONTAINER */
+.popup-card-container{
+    width: 620px;
+
+    background: #ECECEC;
+
+    border-radius: 24px;
+
+    position: relative;
+
+    overflow: hidden;
+
+    padding: 35px;
+
+    font-family: 'Poppins', sans-serif;
+}
+
+/* FAIXA */
+.popup-card-container::after{
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    right: 0;
+
+    width: 28px;
+    height: 100%;
+
+    background: #ffef12;
+}
+
+/* FECHAR */
+.fechar-popup{
+    position: absolute;
+margin-bottom: 40px;
+    
+top: 20px;
+    left: 30px;
+
+    width: 30px;
+    height: 30px;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: #151B74;
+
+    color: white;
+
+    cursor: pointer;
+
+    font-size: 18px;
+}
+
+/* BODY */
+.popup-card-body{
+    display: flex;
+    flex-direction: column;
+
+    gap: 18px;
+}
+
+/* LOGO */
+.popup-logo-bb{
+    width: 90px;
+    height: 90px;
+    margin-right: 10px;
+    margin-bottom: 15px;
+}
+
+/* TÍTULO */
+.popup-card-titulo{
+    font-size: 40px;
+    font-weight: 700;
+ flex: 1;
+    color: #000000;
+   text-align:left;
+    margin: 0;
+}
+
+/* TRILHA */
+.popup-card-trilha{
+    font-size: 20px;
+padding-bottom: 15px;
+    color: #555;
+
+    margin: 0;
+}
+
+/* HORÁRIO */
+.popup-card-horario{
+    width: fit-content;
+
+    background: #151B74;
+
+    color: white;
+
+    padding: 10px 18px;
+
+    border-radius: 10px;
+
+    font-weight: 600;
+}
+
+.topo-card{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+.popup-card-info{
+    display: flex;
+ column-gap: 100px;
+   
+}
+
+.popup-card-info p{
+    margin: 0;
+padding: 5px;
+    font-size: 15px;
+}
+
+/* DESCRIÇÃO */
+.popup-card-descricao{
+    background: #ffffff;
+
+    padding: 18px;
+
+    border-radius: 14px;
+}
+
+.popup-card-descricao h3{
+    margin-top: 0;
+
+    color: #151B74; 
+}
+.evento-popup-footer{
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.evento-btn-editar,
+.evento-btn-fechar{
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.evento-btn-editar{
+    background: #465EFF;
+    color: white;
+}
+
+.evento-btn-fechar{
+    background: #e5e7eb;
+    color: #111827;
+}
+
+.evento-btn-editar:hover,
+.evento-btn-fechar:hover{
+    transform: scale(1.03);
+}
+
+
+
+/*********************************
+ POP PALESTRANTE 
+********************************/
+.mini-foto{
+      width: 200px;
+    height: 300px;
+
+    background: #8080ff;
+
+   border: none;
+    border-radius: 28px;
+    margin: 20px;
+    
+    overflow: hidden;
+margin-left: 1cm;
+    display: flex;
+
+    font-family: 'Poppins', sans-serif;
+}
