@@ -1,4 +1,6 @@
-imgbb/8.png
+<div align="center">
+  <img src="imgbb/8.png" width="500" alt="Descrição da imagem">
+</div>
 
 ---
 
