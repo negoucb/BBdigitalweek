@@ -22,7 +22,7 @@ export default function Dashboard({ dados }) {
   const cards = [
     {
       titulo: 'Sessões',
-      icon: 'https://cdn-icons-png.flaticon.com/512/1442/1442941.png',
+      icon: 'imgbb/sessao.png',
       numero: sessoes.length,
       sub: 'Sessões cadastradas',
       status: [
