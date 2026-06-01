@@ -141,10 +141,9 @@ export default function Palestrantes({ dados, setDados }) {
                   return (
                     <div key={p.id} className="card-palestrante"
                       onClick={() => abrirView(p)}
-                      style={{ cursor: 'pointer', position: 'relative', overflow: 'hidden' }}
                     >
                       {/* barra lateral de cor da trilha */}
-                      <div style={{ position:'absolute', right:0, top:0, width:16, height:'100%', background: cor, borderRadius:'0 28px 28px 0' }} />
+                      <div style={{ position:'absolute', right:0, top:0, width:10, height:'100%', background: cor }} />
                       <div className="foto-p" style={{
                         background: p.foto ? 'none' : cor,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -159,7 +158,7 @@ export default function Palestrantes({ dados, setDados }) {
                         <p style={{ color: '#666' }}>{p.area || '—'}</p>
                         {p.atuacao && <p style={{ fontSize: 12, color: '#9CA3AF' }}>{p.atuacao}</p>}
                         <p style={{ fontSize: 12, color: '#9CA3AF' }}>{p.id}</p>
-                        <span className={`mini-card-status ${estaOcupado ? 'ocupado' : 'disponivel'}`} style={{ fontSize:12 }}>
+                        <span id="badge-status-palestrante" className={`mini-card-status ${estaOcupado ? 'ocupado' : 'disponivel'}`}>
                           {estaOcupado ? 'Ocupado' : 'Disponível'}
                         </span>
                       </div>
