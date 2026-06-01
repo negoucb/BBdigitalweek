@@ -126,7 +126,7 @@ export default function Atividades({ dados, setDados }) {
               <div className="page-card1">
                 <div className="resume2">
                   <h2>Atividades</h2>
-                  <img className="pcard-icon" src={ICONE} alt="" />
+                  <img className="pcard-icon" src="https://cdn-icons-png.flaticon.com/512/1442/1442941.png" alt="" />
                 </div>
                 <div className="pnumber-status">
                   <div>
