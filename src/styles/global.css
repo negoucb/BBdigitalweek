@@ -32,8 +32,8 @@ body {
 }
 
 .bblogo {
-  height: clamp(68px, 6vh, 90px);
-  width: clamp(120px, 12vw, 210px);
+  height: clamp(48px, 6vh, 90px);
+  width: clamp(170px, 12vw, 270px);
   padding-left: clamp(8px, 1vw, 20px);
   object-fit: contain;
 }
