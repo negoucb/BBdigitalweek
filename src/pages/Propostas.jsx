@@ -117,7 +117,7 @@ export default function Propostas({ dados }) {
               {/* ── BLOCO TÉCNICO — mesma estrutura, cor azul ── */}
               <div>
                 <div style={{
-                  background: 'linear-gradient(135deg, #4a90d9 0%, #2563EB 100%)',
+                  background: 'linear-gradient(135deg, #C0392B 0%, #922b21 100%)',
                   borderRadius: '22px 22px 0 0',
                   padding: 'clamp(10px,1.4vw,18px) clamp(14px,2vw,24px)',
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -146,7 +146,7 @@ export default function Propostas({ dados }) {
                     <div style={{
                       width: 'clamp(70px,8vw,110px)',
                       minHeight: 'clamp(80px,10vh,130px)',
-                      background: '#4a90d9',
+                      background: '#C0392B',
                       borderRadius: 18,
                       display: 'flex', flexDirection: 'column',
                       alignItems: 'center', justifyContent: 'center',
@@ -155,19 +155,20 @@ export default function Propostas({ dados }) {
                       flexShrink: 0,
                       boxShadow: 'inset 0 -4px 0 rgba(0,0,0,.15)',
                     }}>
-                      🔧
+                               <img src="imgbb/ferra.png" alt="buscar" className="filtro-busca-icon" style={{ width: 36, height: 36 }} />
+
                     </div>
 
                     <div className="programacao-content">
                       <h2>{a.titulo}</h2>
-                      <h3>Conflito: <span style={{ color: '#4a90d9' }}>{a.conflito}</span></h3>
+                      <h3>Conflito: <span style={{ color: '#C0392B' }}>{a.conflito}</span></h3>
                       <p>Técnico detectado pelo sistema • {a.id}</p>
                     </div>
 
                     <div style={{
                       width: 'clamp(12px,1.1vw,18px)',
                       flexShrink: 0,
-                      background: '#4a90d9',
+                      background: '#C0392B',
                       borderRadius: '0 16px 16px 0',
                     }} />
                   </div>
