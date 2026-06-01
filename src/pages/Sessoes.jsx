@@ -226,7 +226,7 @@ export default function Sessoes({ dados, setDados }) {
               <div className="page-card1">
                 <div className="resume2">
                   <h2>Sessões</h2>
-                  <img className="pcard-icon" src={ICONE} alt="" />
+                  <img className="pcard-icon" src="imgbb/sessao.png" alt="" />
                 </div>
                 <div className="pnumber-status">
                   <div>
