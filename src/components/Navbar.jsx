@@ -35,7 +35,6 @@ export default function Navbar({ titulo = "BB Digital Week", usuario }) {
               <div className="profile-role-badge">Curador</div>
             </div>
             <div className="profile-drop-body">
-              <button className="profile-drop-item">Configurações</button>
               <div className="profile-drop-sep"></div>
               <button className="profile-drop-item danger">Sair</button>
             </div>
