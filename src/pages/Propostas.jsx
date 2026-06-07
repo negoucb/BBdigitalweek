@@ -1,14 +1,19 @@
 import { useState } from "react";
 
-export default function Propostas({ dados }) {
+export default function Propostas({ dados, onRefresh }) {
   const [popup, setPopup] = useState(null);
 
-  const alertas      = dados?.alertas || [];
-  const sessoes      = dados?.sessoes  || [];
+  // Alertas de IA vêm do estado global (dados.alertas)
+  const alertas      = dados?.alertas   || [];
+  const sessoes      = dados?.sessoes   || [];   // sessões da grade
+  const propostas    = dados?.propostas || [];   // proposals do sistema
+
   const similaridade = alertas.filter(a => a.tipo === 'similaridade');
   const tecnicos     = alertas.filter(a => a.tipo === 'tecnico');
 
-  const getSessaoNome = (id) => sessoes.find(s => s.id === id)?.titulo || id;
+  // Busca o título da proposta pelo id_proposal
+  const getNomeProposta = (id) =>
+    propostas.find(p => p.id_proposal === id)?.titulo || `Proposta #${id}`;
 
   return (
     <div className="page">
@@ -17,7 +22,7 @@ export default function Propostas({ dados }) {
           <h1 id="part">Visão geral</h1>
 
           <div className="pag-grid">
-            {/* Card 1+2 (coluna esquerda) */}
+            {/* Card de totais */}
             <div>
               <div className="page-card1">
                 <div className="resume2">
@@ -42,17 +47,16 @@ export default function Propostas({ dados }) {
                     <span className="pulse" />
                     <small>{similaridade.length} conflitos de IA</small>
                   </div>
-                  <p className="pcard-subtitle" style={{ marginLeft: 10 }}>Desde a última atualização</p>
+                  <p className="pcard-subtitle" style={{ marginLeft: 10 }}>Desde a última análise</p>
                 </div>
               </div>
             </div>
 
-            {/* Card 3 — alertas no estilo cronograma */}
+            {/* Card 3 — alertas */}
             <div className="page-card3" style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
 
-              {/* ── BLOCO SIMILARIDADE — igual ao cronograma, cor vermelha ── */}
+              {/* ── SIMILARIDADE ─── */}
               <div style={{ marginBottom: 24 }}>
-                {/* Header estilo agenda-topbar */}
                 <div style={{
                   background: 'linear-gradient(135deg, #C0392B 0%, #922b21 100%)',
                   borderRadius: '22px 22px 0 0',
@@ -70,17 +74,16 @@ export default function Propostas({ dados }) {
                 </div>
 
                 {similaridade.length === 0 && (
-                  <p style={{ color: '#888', padding: 16 }}>Nenhum conflito de similaridade detectado.</p>
+                  <p style={{ color: '#888', padding: 16 }}>
+                    {sessoes.length === 0
+                      ? 'Nenhuma sessão agendada na grade — adicione sessões para detectar conflitos.'
+                      : 'Nenhum conflito de similaridade detectado.'
+                    }
+                  </p>
                 )}
 
-                {/* Linhas no estilo agenda-row: [caixa %] [conteúdo] [barra] */}
                 {similaridade.map(a => (
-                  <div
-                    key={a.id}
-                    className="programacao-card"
-                    onClick={() => setPopup(a)}
-                  >
-                    {/* Caixa de porcentagem — estilo agenda-time-box mas cor vermelha */}
+                  <div key={a.id} className="programacao-card" onClick={() => setPopup(a)}>
                     <div style={{
                       width: 'clamp(70px,8vw,110px)',
                       minHeight: 'clamp(80px,10vh,130px)',
@@ -93,17 +96,13 @@ export default function Propostas({ dados }) {
                       flexShrink: 0,
                       boxShadow: 'inset 0 -4px 0 rgba(0,0,0,.15)',
                     }}>
-                      {a.percentual}%
+                      {a.percentual != null ? `${a.percentual}%` : '—'}
                     </div>
-
-                    {/* Conteúdo */}
                     <div className="programacao-content">
                       <h2>{a.titulo}</h2>
                       <h3>Conflito: <span style={{ color: '#C0392B' }}>{a.conflito}</span></h3>
                       <p>Similaridade detectada pela IA • {a.id}</p>
                     </div>
-
-                    {/* Barra lateral vermelha */}
                     <div style={{
                       width: 'clamp(12px,1.1vw,18px)',
                       flexShrink: 0,
@@ -114,7 +113,7 @@ export default function Propostas({ dados }) {
                 ))}
               </div>
 
-              {/* ── BLOCO TÉCNICO — mesma estrutura, cor azul ── */}
+              {/* ── TÉCNICO ─── */}
               <div>
                 <div style={{
                   background: 'linear-gradient(135deg, #C0392B 0%, #922b21 100%)',
@@ -137,12 +136,7 @@ export default function Propostas({ dados }) {
                 )}
 
                 {tecnicos.map(a => (
-                  <div
-                    key={a.id}
-                    className="programacao-card"
-                    onClick={() => setPopup(a)}
-                  >
-                    {/* Caixa com ícone de ferramenta — azul */}
+                  <div key={a.id} className="programacao-card" onClick={() => setPopup(a)}>
                     <div style={{
                       width: 'clamp(70px,8vw,110px)',
                       minHeight: 'clamp(80px,10vh,130px)',
@@ -155,16 +149,13 @@ export default function Propostas({ dados }) {
                       flexShrink: 0,
                       boxShadow: 'inset 0 -4px 0 rgba(0,0,0,.15)',
                     }}>
-                               <img src="imgbb/ferra.png" alt="buscar" className="filtro-busca-icon" style={{ width: 36, height: 36 }} />
-
+                      <img src="imgbb/ferra.png" alt="conflito" className="filtro-busca-icon" style={{ width: 36, height: 36 }} />
                     </div>
-
                     <div className="programacao-content">
                       <h2>{a.titulo}</h2>
                       <h3>Conflito: <span style={{ color: '#C0392B' }}>{a.conflito}</span></h3>
                       <p>Técnico detectado pelo sistema • {a.id}</p>
                     </div>
-
                     <div style={{
                       width: 'clamp(12px,1.1vw,18px)',
                       flexShrink: 0,
@@ -174,7 +165,6 @@ export default function Propostas({ dados }) {
                   </div>
                 ))}
               </div>
-
             </div>
           </div>
         </div>
@@ -195,13 +185,11 @@ export default function Propostas({ dados }) {
                 <div className="popup-ia-box">{popup.descricao}</div>
                 <div className="popup-ia-footer">
                   <h2>Sessões em conflito</h2>
-                  <span style={{ color: '#d60000' }}>
-                    {(popup.sessoes || []).length}
-                  </span>
+                  <span style={{ color: '#d60000' }}>{(popup.sessoes || []).length}</span>
                   <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                    {(popup.sessoes || []).map(sid => (
-                      <span key={sid} style={{ fontSize: 13, color: '#444' }}>
-                        <strong>{sid}</strong> — {getSessaoNome(sid)}
+                    {(popup.sessoes || []).map((sid, idx) => (
+                      <span key={idx} style={{ fontSize: 13, color: '#444' }}>
+                        <strong>#{sid}</strong> — {getNomeProposta(sid)}
                       </span>
                     ))}
                   </div>
@@ -210,7 +198,7 @@ export default function Propostas({ dados }) {
               <div className="popup-ia-right">
                 {popup.tipo === 'similaridade' ? (
                   <>
-                    <div className="popup-ia-pill">{popup.percentual}%</div>
+                    <div className="popup-ia-pill">{popup.percentual != null ? `${popup.percentual}%` : '—'}</div>
                     <p>Porcentagem de similaridade detectada pela IA</p>
                   </>
                 ) : (

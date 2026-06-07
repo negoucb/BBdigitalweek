@@ -1,4 +1,6 @@
-export default function Sidebar({ paginaAtual, navegar }) {
+export default function Sidebar({ paginaAtual, navegar, usuario }) {
+  const isCurador = usuario?.role === 'curator' || usuario?.role === 'admin';
+
   const navItem = (id, icone, label) => (
     <div
       className={`nav-item${paginaAtual === id ? ' active' : ''}`}
@@ -18,14 +20,18 @@ export default function Sidebar({ paginaAtual, navegar }) {
         {navItem('propostas',  '◧', 'Alertas de IA')}
 
         <div className="sidebar-section-label">Conteúdo</div>
-        {navItem('sessoes',      '◎', 'Sessões')}
-        {navItem('trilhas',      '◉', 'Trilhas')}
         {navItem('atividades',   '◎', 'Atividades')}
-        {navItem('palestrantes', '⬡', 'Palestrantes')}
+        {isCurador && navItem('sessoes',      '◎', 'Sessões (Propostas)')}
+        {isCurador && navItem('trilhas',      '◉', 'Trilhas')}
+        {isCurador && navItem('palestrantes', '⬡', 'Palestrantes')}
 
-        <div className="sidebar-section-label">Organização</div>
-        {navItem('espacos',  '⬡', 'Espaço e Locais')}
-        {navItem('horario',  '✦', 'Horários')}
+        {isCurador && (
+          <>
+            <div className="sidebar-section-label">Organização</div>
+            {navItem('espacos',  '⬡', 'Espaço e Locais')}
+            {navItem('horario',  '✦', 'Horários')}
+          </>
+        )}
       </nav>
     </div>
   );

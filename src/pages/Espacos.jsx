@@ -2,30 +2,39 @@ import { useState } from 'react';
 import Popup, { PopupCard } from '../components/Popup.jsx';
 import ConfirmDelete from '../components/ConfirmDelete.jsx';
 import FiltroAvancado, { aplicarFiltros } from '../components/FiltroAvancado.jsx';
-import { proximoId } from '../data/inicial.js';
+import {
+  criarEspaco,
+  editarEspaco,
+  deletarEspaco,
+} from '../services/api.js';
+import { toast } from '../components/Toast.jsx';
 
 const ICONE = 'https://cdn-icons-png.flaticon.com/512/61/61942.png';
-const FORM_VAZIO = { nome: '', tipo: 'Sala', descricao: '' };
 const TIPOS = ['Sala', 'Auditório', 'Palco'];
-
+const DURACOES_SLOT = [
+  { v: 25, l: '25 minutos' },
+  { v: 50, l: '50 minutos' },
+];
+const FORM_VAZIO = { nome: '', tipo: 'Sala', capacidade: '', duracao_slot: 25 };
 const FILTROS_VAZIOS = {
-  busca: '', buscaId: '', tipo: [], status: [], ordenarPor: 'nome', ordenarDir: 'asc',
+  busca: '', buscaId: '', tipo: [], ordenarPor: 'nome', ordenarDir: 'asc',
 };
 
-export default function Espacos({ dados, setDados }) {
-  const [popup, setPopup]       = useState(null);
-  const [selected, setSelected] = useState(null);
-  const [form, setForm]         = useState(FORM_VAZIO);
+export default function Espacos({ dados, onRefresh }) {
+  const [popup, setPopup]           = useState(null);
+  const [selected, setSelected]     = useState(null);
+  const [form, setForm]             = useState(FORM_VAZIO);
   const [confirmDel, setConfirmDel] = useState(false);
-  const [filtros, setFiltros]   = useState(FILTROS_VAZIOS);
+  const [filtros, setFiltros]       = useState(FILTROS_VAZIOS);
+  const [loading, setLoading]       = useState(false);
+  const [erro, setErro]             = useState('');
 
   const espacos = dados?.espacos || [];
-  const sessoes = dados?.sessoes || [];
+  const sessoes = dados?.sessoes || [];  // sessões da grade para mostrar uso
 
   const configFiltro = {
     grupos: [
-      { chave: 'tipo',   label: 'Tipo de Espaço', opcoes: TIPOS },
-      { chave: 'status', label: 'Status',          opcoes: ['Ocupado', 'Disponível'] },
+      { chave: 'tipo', label: 'Tipo de Espaço', opcoes: TIPOS },
     ],
     ordenarPor: [
       { v: 'nome', l: 'Nome' },
@@ -34,45 +43,90 @@ export default function Espacos({ dados, setDados }) {
   };
 
   const camposFiltro = {
-    busca:  ['nome', 'tipo', 'descricao'],
-    buscaId: 'id',
-    tipo:   'tipo',
-    status: item => sessoes.some(s => s.local === item.nome) ? 'Ocupado' : 'Disponível',
+    busca:   ['nome', 'tipo'],
+    buscaId: 'id_stage',
+    tipo:    'tipo',
     ordenar: { nome: 'nome', tipo: 'tipo' },
   };
 
   const espacosFiltrados = aplicarFiltros(espacos, filtros, camposFiltro);
 
-  function abrirView(e) { setSelected(e); setPopup('view'); }
+  function abrirView(e)   { setSelected(e); setPopup('view'); setErro(''); }
   function abrirEditar(e) {
-    setForm({ nome: e.nome, tipo: e.tipo, descricao: e.descricao });
-    setSelected(e); setPopup('editar');
+    setForm({ nome: e.nome, tipo: e.tipo || 'Sala', capacidade: e.capacidade || '', duracao_slot: e.duracao_slot || 25 });
+    setSelected(e); setPopup('editar'); setErro('');
   }
-  function salvarEdicao() {
-    setDados(d => ({ ...d, espacos: d.espacos.map(e => e.id === selected.id ? { ...e, ...form } : e) }));
-    setPopup(null);
+
+  async function salvarEdicao() {
+    setLoading(true); setErro('');
+    try {
+      await editarEspaco(selected.id_stage, {
+        nome: form.nome,
+        tipo: form.tipo,
+        capacidade: form.capacidade ? parseInt(form.capacidade) : null,
+        duracao_slot: parseInt(form.duracao_slot),
+      });
+      await onRefresh();
+      setPopup(null);
+      toast.success('Espaço atualizado!');
+    } catch (err) {
+      const msg = err.status === 0 ? 'Sem conexão com o servidor.' : (err.message || 'Erro ao salvar. Tente novamente.');
+      setErro(msg);
+      if (err.status === 0) toast.error(msg);
+    } finally {
+      setLoading(false);
+    }
   }
-  function salvarNovo() {
-    const novoId = proximoId('E', espacos);
-    setDados(d => ({ ...d, espacos: [...d.espacos, { ...form, id: novoId }] }));
-    setForm(FORM_VAZIO); setPopup(null);
+
+  async function salvarNovo() {
+    setLoading(true); setErro('');
+    try {
+      await criarEspaco({
+        nome: form.nome,
+        tipo: form.tipo,
+        capacidade: form.capacidade ? parseInt(form.capacidade) : null,
+        duracao_slot: parseInt(form.duracao_slot),
+      });
+      await onRefresh();
+      setForm(FORM_VAZIO); setPopup(null);
+      toast.success('Espaço criado com sucesso!');
+    } catch (err) {
+      const msg = err.status === 0 ? 'Sem conexão com o servidor.' : (err.message || 'Erro ao criar. Tente novamente.');
+      setErro(msg);
+      if (err.status === 0) toast.error(msg);
+    } finally {
+      setLoading(false);
+    }
   }
-  function deletar() {
-    setDados(d => ({ ...d, espacos: d.espacos.filter(e => e.id !== selected.id) }));
-    setConfirmDel(false); setPopup(null); setSelected(null);
+
+  async function deletar() {
+    setLoading(true); setErro('');
+    try {
+      await deletarEspaco(selected.id_stage);
+      await onRefresh();
+      setConfirmDel(false); setPopup(null); setSelected(null);
+      toast.success('Espaço excluído!');
+    } catch (err) {
+      const msg = err.status === 0 ? 'Sem conexão com o servidor.' : (err.message || 'Erro ao excluir. Tente novamente.');
+      setErro(msg);
+      toast.error(msg);
+      setConfirmDel(false);
+    } finally {
+      setLoading(false);
+    }
   }
 
   const campo = (lbl, name, tipo = 'input', opts = []) => (
     <div className="campo-popup" key={name}>
       <label>{lbl}</label>
       {tipo === 'select' ? (
-        <select value={form[name] || ''} onChange={e => setForm(f => ({ ...f, [name]: e.target.value }))}>
+        <select value={form[name] ?? ''} onChange={e => setForm(f => ({ ...f, [name]: e.target.value }))}>
           {opts.map(o => <option key={o.v} value={o.v}>{o.l}</option>)}
         </select>
       ) : tipo === 'textarea' ? (
         <textarea value={form[name] || ''} onChange={e => setForm(f => ({ ...f, [name]: e.target.value }))} />
       ) : (
-        <input type="text" value={form[name] || ''} onChange={e => setForm(f => ({ ...f, [name]: e.target.value }))}
+        <input type={tipo} value={form[name] || ''} onChange={e => setForm(f => ({ ...f, [name]: e.target.value }))}
           placeholder={`Digite ${lbl.toLowerCase()}`} />
       )}
     </div>
@@ -109,10 +163,10 @@ export default function Espacos({ dados, setDados }) {
                 <div className="status"><h2>Status</h2></div>
                 <div className="status-page">
                   <div className="statusp-item green"><span className="pulse" />
-                    <small>{espacos.filter(e => sessoes.some(s => s.local === e.nome)).length} em uso</small>
+                    <small>{espacos.filter(e => sessoes.some(s => s.id_stage === e.id_stage)).length} em uso</small>
                   </div>
                   <div className="statusp-item orange"><span className="pulse" />
-                    <small>{espacos.filter(e => !sessoes.some(s => s.local === e.nome)).length} disponíveis</small>
+                    <small>{espacos.filter(e => !sessoes.some(s => s.id_stage === e.id_stage)).length} disponíveis</small>
                   </div>
                   <p className="pcard-subtitle" style={{ marginLeft: 10 }}>Desde a última atualização</p>
                 </div>
@@ -122,12 +176,12 @@ export default function Espacos({ dados, setDados }) {
             <div className="page-card3">
               <div className="card-list" style={{ flexDirection:'column', width:'100%' }}>
                 {espacosFiltrados.map(e => {
-                  const emUso = sessoes.some(s => s.local === e.nome);
+                  const emUso = sessoes.some(s => s.id_stage === e.id_stage);
                   return (
-                    <div key={e.id} className="mini-table-card" onClick={() => abrirView(e)}
+                    <div key={e.id_stage} className="mini-table-card" onClick={() => abrirView(e)}
                       style={{ cursor:'pointer' }}>
                       <div className="mini-card-nome">{e.nome}</div>
-                      <div style={{ fontSize:12, color:'#666' }}>{e.tipo}</div>
+                      <div style={{ fontSize:12, color:'#666' }}>{e.tipo} · {e.duracao_slot}min/slot · cap. {e.capacidade || '—'}</div>
                       <div className={`mini-card-status ${emUso ? 'ocupado' : 'disponivel'}`}>
                         {emUso ? 'Ocupado' : 'Disponível'}
                       </div>
@@ -142,7 +196,9 @@ export default function Espacos({ dados, setDados }) {
           </div>
 
           <div className="below-btn">
-            <button className="ce-btnp" onClick={() => { setForm(FORM_VAZIO); setPopup('criar'); }}>Criar espaço</button>
+            <button className="ce-btnp" onClick={() => { setForm(FORM_VAZIO); setPopup('criar'); setErro(''); }}>
+              Criar espaço
+            </button>
           </div>
         </div>
       </div>
@@ -155,13 +211,13 @@ export default function Espacos({ dados, setDados }) {
               <h2 className="popup-card-titulo">{selected.nome}</h2>
               <img className="popup-logo-bb" src="imgbb/bb.png" alt="" />
             </div>
-            <div className="popup-card-descricao"><h3>Descrição</h3><p>{selected.descricao || '—'}</p></div>
             <div className="popup-card-info">
               <div>
                 <p><strong>Tipo:</strong> {selected.tipo}</p>
-                <p><strong>Sessões alocadas:</strong> {sessoes.filter(s => s.local === selected.nome).length}</p>
+                <p><strong>Capacidade:</strong> {selected.capacidade || '—'}</p>
+                <p><strong>Duração do slot:</strong> {selected.duracao_slot} minutos</p>
               </div>
-              <div><p><strong>ID:</strong> {selected.id}</p></div>
+              <div><p><strong>ID:</strong> {selected.id_stage}</p></div>
             </div>
           </>
         )}
@@ -170,20 +226,28 @@ export default function Espacos({ dados, setDados }) {
       <Popup aberto={popup === 'editar'} onFechar={() => setPopup(null)} titulo="Editar Espaço">
         {campo('Nome', 'nome')}
         {campo('Tipo', 'tipo', 'select', TIPOS.map(t => ({ v: t, l: t })))}
-        {campo('Descrição', 'descricao', 'textarea')}
+        {campo('Capacidade', 'capacidade', 'number')}
+        {campo('Duração do slot', 'duracao_slot', 'select', DURACOES_SLOT)}
+        {erro && <p style={{ color: '#D92D20', fontSize: 13, margin: '4px 0' }}>{erro}</p>}
         <div className="popup-botoes">
-          <button className="cancelar-btn" onClick={() => setPopup('view')}>Cancelar</button>
-          <button className="salvar-btn" onClick={salvarEdicao}>Salvar Alterações</button>
+          <button className="cancelar-btn" onClick={() => setPopup('view')} disabled={loading}>Cancelar</button>
+          <button className="salvar-btn" onClick={salvarEdicao} disabled={loading}>
+            {loading ? 'Salvando...' : 'Salvar Alterações'}
+          </button>
         </div>
       </Popup>
 
       <Popup aberto={popup === 'criar'} onFechar={() => setPopup(null)} titulo="Cadastrar Espaço">
         {campo('Nome', 'nome')}
         {campo('Tipo', 'tipo', 'select', TIPOS.map(t => ({ v: t, l: t })))}
-        {campo('Descrição', 'descricao', 'textarea')}
+        {campo('Capacidade', 'capacidade', 'number')}
+        {campo('Duração do slot', 'duracao_slot', 'select', DURACOES_SLOT)}
+        {erro && <p style={{ color: '#D92D20', fontSize: 13, margin: '4px 0' }}>{erro}</p>}
         <div className="popup-botoes">
-          <button className="cancelar-btn" onClick={() => setPopup(null)}>Cancelar</button>
-          <button className="salvar-btn" onClick={salvarNovo}>Salvar</button>
+          <button className="cancelar-btn" onClick={() => setPopup(null)} disabled={loading}>Cancelar</button>
+          <button className="salvar-btn" onClick={salvarNovo} disabled={loading}>
+            {loading ? 'Salvando...' : 'Salvar'}
+          </button>
         </div>
       </Popup>
 

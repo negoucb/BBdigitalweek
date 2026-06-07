@@ -2,94 +2,152 @@ import { useState } from 'react';
 import Popup, { PopupCard } from '../components/Popup.jsx';
 import ConfirmDelete from '../components/ConfirmDelete.jsx';
 import FiltroAvancado, { aplicarFiltros } from '../components/FiltroAvancado.jsx';
-import { COR_TRILHA, NOME_TRILHA, proximoId, classeTrilha } from '../data/inicial.js';
+import { corParaTrilha } from '../data/inicial.js';
+import {
+  criarProposta,
+  editarProposta,
+  deletarProposta,
+} from '../services/api.js';
+import { toast } from '../components/Toast.jsx';
 
 const ICONE = 'https://cdn-icons-png.flaticon.com/512/1828/1828919.png';
-const FORM_VAZIO = { nome: '', tipo: 'Palestra', trilha: '', descricao: '', nivel: '', tags: [] };
+
+// Tipos de atividade mapeados no campo 'formato' da Proposal
 const TIPOS_OPCOES = ['Palestra', 'Workshop', 'Painel', 'Mesa Redonda',
                       'Mentoria', 'Networking', 'Keynote', 'Keynote Técnico'];
 const NIVEIS = ['Iniciante', 'Intermediário', 'Avançado'];
-const TAGS   = ['IA', 'Cloud', 'DevOps', 'Segurança', 'Dados', 'Frontend', 'Backend', 'Mobile', 'UX', 'Agile'];
-const STATUS_OPCOES = ['Pendente', 'Em Revisão', 'Aprovado', 'Confirmado', 'Concluído', 'Cancelado'];
+const STATUS_OPCOES = ['PENDING', 'REVIEW', 'APPROVED', 'REJECTED'];
+const STATUS_LABEL  = { PENDING: 'Pendente', REVIEW: 'Em Revisão', APPROVED: 'Aprovado', REJECTED: 'Rejeitado' };
 
+const FORM_VAZIO = { titulo: '', formato: 'Palestra', id_track: '', nivel: '', descricao: '' };
 const FILTROS_VAZIOS = {
-  busca: '', buscaId: '', trilha: [], tipo: [], nivel: [], tags: [], status: [],
-  ordenarPor: 'nome', ordenarDir: 'asc',
+  busca: '', buscaId: '', tipo: [], nivel: [], ordenarPor: 'titulo', ordenarDir: 'asc',
 };
 
-export default function Atividades({ dados, setDados }) {
+export default function Atividades({ dados, onRefresh }) {
   const [popup, setPopup]           = useState(null);
   const [selected, setSelected]     = useState(null);
   const [form, setForm]             = useState(FORM_VAZIO);
   const [confirmDel, setConfirmDel] = useState(false);
   const [filtros, setFiltros]       = useState(FILTROS_VAZIOS);
+  const [loading, setLoading]       = useState(false);
+  const [erro, setErro]             = useState('');
 
-  const atividades = dados?.atividades || [];
-  const trilhas    = dados?.trilhas    || [];
-
-  const aprovadas = atividades.filter(a => a.status === 'aprovado').length;
-  const andamento = atividades.filter(a => a.status === 'andamento').length;
-
-  const trilhasOpcoes = trilhas.map(t => t.nome);
+  // Usa propostas como "atividades" (uma proposta é uma atividade submetida)
+  const propostas = dados?.propostas || [];
+  const trilhas   = dados?.trilhas   || [];
+  const usuario   = dados?.usuario;
 
   const configFiltro = {
     grupos: [
-      { chave: 'trilha', label: 'Trilha',
-        opcoes: ['UX', 'IA', 'Desenvolvimento', 'Dados', 'Segurança', 'Cloud', 'Mobile', 'DevOps', 'Gestão'] },
-      { chave: 'tipo',   label: 'Tipo de Atividade', opcoes: TIPOS_OPCOES },
-      { chave: 'nivel',  label: 'Nível', opcoes: NIVEIS },
-      { chave: 'tags',   label: 'Tags',  opcoes: TAGS },
-      { chave: 'status', label: 'Status', opcoes: STATUS_OPCOES },
+      { chave: 'tipo',  label: 'Tipo de Atividade', opcoes: TIPOS_OPCOES },
+      { chave: 'nivel', label: 'Nível', opcoes: NIVEIS },
+      { chave: 'status', label: 'Status', opcoes: Object.values(STATUS_LABEL) },
     ],
     ordenarPor: [
-      { v: 'nome',  l: 'Título' },
-      { v: 'trilha', l: 'Trilha' },
-      { v: 'tipo',  l: 'Tipo' },
-      { v: 'nivel', l: 'Nível' },
+      { v: 'titulo', l: 'Título' },
+      { v: 'formato', l: 'Tipo' },
+      { v: 'nivel',  l: 'Nível' },
     ],
   };
 
   const camposFiltro = {
-    busca:  ['nome'],
-    buscaId: 'id',
-    trilha: item => NOME_TRILHA[item.trilha] || item.trilha,
-    tipo:   'tipo',
-    nivel:  'nivel',
-    tags:   item => item.tags || [],
-    status: item => { const m = { andamento: 'Pendente', aprovado: 'Aprovado' }; return m[item.status] || item.status; },
-    ordenar: { nome: 'nome', trilha: 'trilha', tipo: 'tipo', nivel: 'nivel' },
+    busca:   ['titulo', 'descricao'],
+    buscaId: 'id_proposal',
+    tipo:    'formato',
+    nivel:   'nivel',
+    status:  item => STATUS_LABEL[item.status] || item.status,
+    ordenar: { titulo: 'titulo', formato: 'formato', nivel: 'nivel' },
   };
 
-  const atividadesFiltradas = aplicarFiltros(atividades, filtros, camposFiltro);
+  const propostasFiltradas = aplicarFiltros(propostas, filtros, camposFiltro);
 
-  function abrirView(a)  { setSelected(a); setPopup('view'); }
+  const nomeTrilha = (id) => trilhas.find(t => t.id_track === id)?.nome || `Trilha #${id}`;
+  const corTrilha  = (id) => { const t = trilhas.find(t => t.id_track === id); return t ? corParaTrilha(t.nome) : '#9CA3AF'; };
+
+  function abrirView(a)   { setSelected(a); setPopup('view'); setErro(''); }
   function abrirEditar(a) {
-    setForm({ nome: a.nome, tipo: a.tipo, trilha: a.trilha, descricao: a.descricao || '',
-              nivel: a.nivel || '', tags: a.tags || [] });
-    setSelected(a); setPopup('editar');
-  }
-  function salvarEdicao() {
-    setDados(d => ({ ...d, atividades: d.atividades.map(a => a.id === selected.id ? { ...a, ...form } : a) }));
-    setPopup(null);
-  }
-  function salvarNovo() {
-    const novoId = proximoId('A', atividades);
-    setDados(d => ({ ...d, atividades: [...d.atividades, { ...form, id: novoId, status: 'andamento' }] }));
-    setForm(FORM_VAZIO); setPopup(null);
-  }
-  function deletar() {
-    setDados(d => ({ ...d, atividades: d.atividades.filter(a => a.id !== selected.id) }));
-    setConfirmDel(false); setPopup(null); setSelected(null);
-  }
-  function aprovar() {
-    setDados(d => ({ ...d, atividades: d.atividades.map(a => a.id === selected.id ? { ...a, status: 'aprovado' } : a) }));
-    setSelected(prev => ({ ...prev, status: 'aprovado' })); setPopup(null);
+    setForm({ titulo: a.titulo, formato: a.formato || 'Palestra', id_track: a.id_track || '', nivel: a.nivel || '', descricao: a.descricao || '' });
+    setSelected(a); setPopup('editar'); setErro('');
   }
 
-  const trilhaOpts = trilhas.map(t => ({
-    v: Object.keys(COR_TRILHA).find(k => t.nome.toLowerCase().includes(k)) || t.id,
-    l: t.nome,
-  }));
+  async function salvarEdicao() {
+    setLoading(true); setErro('');
+    try {
+      await editarProposta(selected.id_proposal, {
+        titulo:   form.titulo,
+        formato:  form.formato,
+        id_track: form.id_track ? parseInt(form.id_track) : null,
+        nivel:    form.nivel,
+        descricao: form.descricao,
+      });
+      await onRefresh();
+      setPopup(null);
+      toast.success('Atividade atualizada!');
+    } catch (err) {
+      const msg = err.status === 0 ? 'Sem conexão com o servidor.' : (err.message || 'Erro ao salvar. Tente novamente.');
+      setErro(msg);
+      if (err.status === 0) toast.error(msg);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function salvarNovo() {
+    if (!form.id_track) { setErro('Selecione uma trilha.'); return; }
+    setLoading(true); setErro('');
+    try {
+      // id_creator vem do usuário logado (guardado na sessão pelo backend)
+      // enviamos o que o backend espera; id_creator é preenchido no backend via session se necessário
+      await criarProposta({
+        titulo:     form.titulo,
+        formato:    form.formato,
+        id_track:   parseInt(form.id_track),
+        nivel:      form.nivel,
+        descricao:  form.descricao,
+        id_creator: dados?.usuarioLogado?.id_usuario || 1, // fallback seguro
+      });
+      await onRefresh();
+      setForm(FORM_VAZIO); setPopup(null);
+      toast.success('Atividade criada com sucesso!');
+    } catch (err) {
+      const msg = err.status === 0 ? 'Sem conexão com o servidor.' : (err.message || 'Erro ao criar. Tente novamente.');
+      setErro(msg);
+      if (err.status === 0) toast.error(msg);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function aprovar() {
+    setLoading(true); setErro('');
+    try {
+      await editarProposta(selected.id_proposal, { status: 'APPROVED' });
+      await onRefresh();
+      setPopup(null);
+    } catch (err) {
+      setErro(err.message || 'Erro ao aprovar.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function deletar() {
+    setLoading(true); setErro('');
+    try {
+      await deletarProposta(selected.id_proposal);
+      await onRefresh();
+      setConfirmDel(false); setPopup(null); setSelected(null);
+      toast.success('Atividade excluída!');
+    } catch (err) {
+      const msg = err.status === 0 ? 'Sem conexão com o servidor.' : (err.message || 'Erro ao excluir. Tente novamente.');
+      setErro(msg);
+      toast.error(msg);
+      setConfirmDel(false);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   const campo = (lbl, name, tipo = 'input', opts = []) => (
     <div className="campo-popup" key={name}>
@@ -117,8 +175,8 @@ export default function Atividades({ dados, setDados }) {
             <h1 id="part">Visão geral</h1>
             <FiltroAvancado filtros={filtros} setFiltros={setFiltros}
               config={configFiltro} placeholder="Pesquisar por nome..."
-              totalResultados={atividadesFiltradas.length}
-              totalGeral={atividades.length} />
+              totalResultados={propostasFiltradas.length}
+              totalGeral={propostas.length} />
           </div>
 
           <div className="pag-grid">
@@ -131,18 +189,22 @@ export default function Atividades({ dados, setDados }) {
                 <div className="pnumber-status">
                   <div>
                     <h1 className="pcard-number">
-                      {atividadesFiltradas.length}
-                      <span style={{fontSize:14,fontWeight:400,color:'#888'}}>/{atividades.length}</span>
+                      {propostasFiltradas.length}
+                      <span style={{fontSize:14,fontWeight:400,color:'#888'}}>/{propostas.length}</span>
                     </h1>
-                    <p className="pcard-subtitle">Atividades{atividadesFiltradas.length !== atividades.length ? ' encontradas' : ' cadastradas'}</p>
+                    <p className="pcard-subtitle">Atividades{propostasFiltradas.length !== propostas.length ? ' encontradas' : ' cadastradas'}</p>
                   </div>
                 </div>
               </div>
               <div className="page-card2">
                 <div className="status"><h2>Status</h2></div>
                 <div className="status-page">
-                  <div className="statusp-item green"><span className="pulse" /><small>{aprovadas} aprovadas</small></div>
-                  <div className="statusp-item orange"><span className="pulse" /><small>{andamento} em andamento</small></div>
+                  <div className="statusp-item green"><span className="pulse" />
+                    <small>{propostas.filter(p => p.status === 'APPROVED').length} aprovadas</small>
+                  </div>
+                  <div className="statusp-item orange"><span className="pulse" />
+                    <small>{propostas.filter(p => p.status === 'PENDING').length} pendentes</small>
+                  </div>
                   <p className="pcard-subtitle" style={{ marginLeft: 10 }}>Desde a última atualização</p>
                 </div>
               </div>
@@ -150,26 +212,26 @@ export default function Atividades({ dados, setDados }) {
 
             <div className="page-card3">
               <div className="card-list" style={{ flexDirection: 'column', width: '100%' }}>
-                {atividadesFiltradas.map(a => {
-                  const cor = COR_TRILHA[a.trilha] || '#9CA3AF';
+                {propostasFiltradas.map(a => {
+                  const cor = corTrilha(a.id_track);
                   return (
-                    <div key={a.id} className="mini-table-card" onClick={() => abrirView(a)}
+                    <div key={a.id_proposal} className="mini-table-card" onClick={() => abrirView(a)}
                       style={{ position: 'relative', overflow: 'hidden', cursor: 'pointer' }}>
                       <div style={{ position:'absolute', right:0, top:0, width:18, height:'100%',
                         background: cor, borderRadius:'0 16px 16px 0' }} />
-                      <div className="mini-card-nome">{a.nome}</div>
-                      <div style={{ fontSize: 12, color: '#666' }}>{a.tipo}</div>
-                      <div style={{ fontSize: 12, color: a.trilha ? cor : '#9CA3AF', fontWeight: 600, paddingRight: 28 }}>
-                        {a.trilha ? (NOME_TRILHA[a.trilha] || a.trilha) : 'Sem trilha'}
+                      <div className="mini-card-nome">{a.titulo}</div>
+                      <div style={{ fontSize: 12, color: '#666' }}>{a.formato || '—'}</div>
+                      <div style={{ fontSize: 12, color: cor, fontWeight: 600, paddingRight: 28 }}>
+                        {nomeTrilha(a.id_track)}
                       </div>
-                      <div className={`mini-card-status ${a.status === 'aprovado' ? 'ativo' : 'pendente'}`}
+                      <div className={`mini-card-status ${a.status === 'APPROVED' ? 'ativo' : 'pendente'}`}
                         style={{ paddingRight: 34 }}>
-                        {a.status === 'aprovado' ? 'verificado' : 'pendente'}
+                        {STATUS_LABEL[a.status] || a.status}
                       </div>
                     </div>
                   );
                 })}
-                {atividadesFiltradas.length === 0 && (
+                {propostasFiltradas.length === 0 && (
                   <p style={{ color: '#888', padding: 16 }}>Nenhuma atividade encontrada.</p>
                 )}
               </div>
@@ -177,24 +239,25 @@ export default function Atividades({ dados, setDados }) {
           </div>
 
           <div className="below-btn">
-            <button className="ce-btnp" onClick={() => { setForm(FORM_VAZIO); setPopup('criar'); }}>Criar atividade</button>
+            <button className="ce-btnp" onClick={() => { setForm(FORM_VAZIO); setPopup('criar'); setErro(''); }}>
+              Criar atividade
+            </button>
           </div>
         </div>
       </div>
 
       <PopupCard aberto={popup === 'view'} onFechar={() => setPopup(null)}
         onEditar={() => abrirEditar(selected)} onDeletar={() => setConfirmDel(true)}
-        onAprovar={aprovar} statusItem={selected?.status}
-        trilhaCor={COR_TRILHA[selected?.trilha] || '#9CA3AF'}>
+        onAprovar={selected?.status !== 'APPROVED' ? aprovar : null} statusItem={selected?.status}
+        trilhaCor={corTrilha(selected?.id_track)}>
         {selected && (
           <>
             <div className="topo-card">
-              <h2 className="popup-card-titulo">{selected.nome}</h2>
+              <h2 className="popup-card-titulo">{selected.titulo}</h2>
               <img className="popup-logo-bb" src="imgbb/bb.png" alt="" />
             </div>
             <p className="popup-card-trilha">
-              Trilha: {selected.trilha ? (NOME_TRILHA[selected.trilha] || selected.trilha)
-                : <em style={{ color: '#9CA3AF' }}>Sem trilha</em>}
+              Trilha: {nomeTrilha(selected.id_track)}
             </p>
             <div className="popup-card-descricao">
               <h3>Descrição</h3>
@@ -202,42 +265,48 @@ export default function Atividades({ dados, setDados }) {
             </div>
             <div className="popup-card-info">
               <div>
-                <p><strong>Tipo:</strong> {selected.tipo}</p>
+                <p><strong>Tipo:</strong> {selected.formato || '—'}</p>
                 <p><strong>Nível:</strong> {selected.nivel || '—'}</p>
-                <p><strong>Status:</strong> {selected.status}</p>
+                <p><strong>Status:</strong> {STATUS_LABEL[selected.status] || selected.status}</p>
               </div>
-              <div><p><strong>ID:</strong> {selected.id}</p></div>
+              <div><p><strong>ID:</strong> {selected.id_proposal}</p></div>
             </div>
           </>
         )}
       </PopupCard>
 
       <Popup aberto={popup === 'editar'} onFechar={() => setPopup(null)} titulo="Editar Atividade">
-        {campo('Nome', 'nome')}
-        {campo('Tipo', 'tipo', 'select', TIPOS_OPCOES.map(t => ({ v: t, l: t })))}
-        {campo('Trilha', 'trilha', 'select', trilhaOpts)}
+        {campo('Título', 'titulo')}
+        {campo('Tipo', 'formato', 'select', TIPOS_OPCOES.map(t => ({ v: t, l: t })))}
+        {campo('Trilha', 'id_track', 'select', trilhas.map(t => ({ v: t.id_track, l: t.nome })))}
         {campo('Nível', 'nivel', 'select', NIVEIS.map(n => ({ v: n, l: n })))}
         {campo('Descrição', 'descricao', 'textarea')}
+        {erro && <p style={{ color: '#D92D20', fontSize: 13, margin: '4px 0' }}>{erro}</p>}
         <div className="popup-botoes">
-          <button className="cancelar-btn" onClick={() => setPopup('view')}>Cancelar</button>
-          <button className="salvar-btn" onClick={salvarEdicao}>Salvar Alterações</button>
+          <button className="cancelar-btn" onClick={() => setPopup('view')} disabled={loading}>Cancelar</button>
+          <button className="salvar-btn" onClick={salvarEdicao} disabled={loading}>
+            {loading ? 'Salvando...' : 'Salvar Alterações'}
+          </button>
         </div>
       </Popup>
 
       <Popup aberto={popup === 'criar'} onFechar={() => setPopup(null)} titulo="Cadastrar Atividade">
-        {campo('Nome', 'nome')}
-        {campo('Tipo', 'tipo', 'select', TIPOS_OPCOES.map(t => ({ v: t, l: t })))}
-        {campo('Trilha', 'trilha', 'select', trilhaOpts)}
+        {campo('Título', 'titulo')}
+        {campo('Tipo', 'formato', 'select', TIPOS_OPCOES.map(t => ({ v: t, l: t })))}
+        {campo('Trilha', 'id_track', 'select', trilhas.map(t => ({ v: t.id_track, l: t.nome })))}
         {campo('Nível', 'nivel', 'select', NIVEIS.map(n => ({ v: n, l: n })))}
         {campo('Descrição', 'descricao', 'textarea')}
+        {erro && <p style={{ color: '#D92D20', fontSize: 13, margin: '4px 0' }}>{erro}</p>}
         <div className="popup-botoes">
-          <button className="cancelar-btn" onClick={() => setPopup(null)}>Cancelar</button>
-          <button className="salvar-btn" onClick={salvarNovo}>Salvar</button>
+          <button className="cancelar-btn" onClick={() => setPopup(null)} disabled={loading}>Cancelar</button>
+          <button className="salvar-btn" onClick={salvarNovo} disabled={loading}>
+            {loading ? 'Salvando...' : 'Salvar'}
+          </button>
         </div>
       </Popup>
 
       {confirmDel && (
-        <ConfirmDelete mensagem={`Deseja excluir a atividade "${selected?.nome}" permanentemente?`}
+        <ConfirmDelete mensagem={`Deseja excluir a atividade "${selected?.titulo}" permanentemente?`}
           onConfirmar={deletar} onCancelar={() => setConfirmDel(false)} />
       )}
     </div>

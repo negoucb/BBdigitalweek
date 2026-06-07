@@ -2,189 +2,148 @@ import { useState } from 'react';
 import Popup, { PopupCard } from '../components/Popup.jsx';
 import ConfirmDelete from '../components/ConfirmDelete.jsx';
 import FiltroAvancado, { aplicarFiltros } from '../components/FiltroAvancado.jsx';
-import { COR_TRILHA, NOME_TRILHA, proximoId, classeTrilha } from '../data/inicial.js';
+import { corParaTrilha } from '../data/inicial.js';
+import {
+  criarProposta,
+  editarProposta,
+  deletarProposta,
+} from '../services/api.js';
+import { toast } from '../components/Toast.jsx';
 
-const ICONE = 'https://cdn-icons-png.flaticon.com/512/7162/7162245.png';
-const FORM_VAZIO = { titulo: '', trilha: '', atividade: '', local: '', horario: '', palestrante: '',
-                     dia: '26', descricao: '', nivel: '', tags: [] };
+const STATUS_LABEL = { PENDING: 'Pendente', REVIEW: 'Em Revisão', APPROVED: 'Aprovado', REJECTED: 'Rejeitado' };
+const TIPOS_OPCOES = ['Palestra', 'Workshop', 'Painel', 'Mesa Redonda', 'Mentoria', 'Networking', 'Keynote', 'Keynote Técnico'];
+const NIVEIS = ['Iniciante', 'Intermediário', 'Avançado'];
 
+const FORM_VAZIO = { titulo: '', formato: 'Palestra', id_track: '', nivel: '', descricao: '' };
 const FILTROS_VAZIOS = {
-  busca: '', buscaId: '', trilha: [], tipo: [], espaco: [], dia: [], periodo: [],
-  nivel: [], palestrante: [], status: [],
-  ordenarPor: 'horario', ordenarDir: 'asc',
+  busca: '', buscaId: '', status: [], ordenarPor: 'titulo', ordenarDir: 'asc',
 };
 
-const ESPACOS_OPCOES = ['Sala', 'Auditório', 'Palco'];
-
-const TIPOS_OPCOES = [
-  'Palestra', 'Workshop', 'Painel', 'Mesa Redonda',
-  'Mentoria', 'Networking', 'Keynote', 'Keynote Técnico',
-];
-
-const NIVEIS = ['Iniciante', 'Intermediário', 'Avançado'];
-const TAGS   = ['IA', 'Cloud', 'DevOps', 'Segurança', 'Dados', 'Frontend', 'Backend', 'Mobile', 'UX', 'Agile'];
-const STATUS_OPCOES = ['Pendente', 'Em Revisão', 'Aprovado', 'Confirmado', 'Concluído', 'Cancelado'];
-
-export default function Sessoes({ dados, setDados }) {
+export default function Sessoes({ dados, onRefresh }) {
   const [popup, setPopup]           = useState(null);
   const [selected, setSelected]     = useState(null);
   const [form, setForm]             = useState(FORM_VAZIO);
   const [confirmDel, setConfirmDel] = useState(false);
   const [filtros, setFiltros]       = useState(FILTROS_VAZIOS);
+  const [loading, setLoading]       = useState(false);
+  const [erro, setErro]             = useState('');
 
-  const sessoes      = dados?.sessoes      || [];
-  const trilhas      = dados?.trilhas      || [];
-  const palestrantes = dados?.palestrantes || [];
-  const espacos      = dados?.espacos      || [];
-  const horarios     = dados?.horarios     || [];
-  const atividades   = dados?.atividades   || [];
+  // "Sessões" no frontend = Proposals no backend
+  const propostas = dados?.propostas || [];
+  const trilhas   = dados?.trilhas   || [];
+  const sessoes   = dados?.sessoes   || []; // grade de sessões (junction)
 
-  const aprovadas = sessoes.filter(s => s.status === 'aprovado').length;
-  const andamento = sessoes.filter(s => s.status === 'andamento').length;
+  const aprovadas = propostas.filter(p => p.status === 'APPROVED').length;
+  const pendentes = propostas.filter(p => p.status === 'PENDING' || p.status === 'REVIEW').length;
 
-  // Deriva nomes de trilhas dos dados cadastrados
-  const trilhasOpcoes = trilhas.map(t => t.nome);
-  // Palestrantes cadastrados
-  const palestrantesOpcoes = palestrantes.map(p => p.nome);
-
-  // Config do filtro
   const configFiltro = {
     grupos: [
-      {
-        chave: 'trilha',
-        label: 'Trilha',
-        opcoes: ['UX', 'IA', 'Desenvolvimento', 'Dados', 'Segurança', 'Cloud', 'Mobile', 'DevOps', 'Gestão'],
-      },
-      {
-        chave: 'tipo',
-        label: 'Tipo de Atividade',
-        opcoes: TIPOS_OPCOES,
-      },
-      {
-        chave: 'espaco',
-        label: 'Espaço',
-        opcoes: ESPACOS_OPCOES,
-      },
-      {
-        chave: 'dia',
-        label: 'Dia do Evento',
-        opcoes: ['21/09', '22/09', '23/09'],
-      },
-      {
-        chave: 'periodo',
-        label: 'Horário',
-        opcoes: ['Manhã', 'Tarde', 'Noite', 'Todos'],
-      },
-      {
-        chave: 'nivel',
-        label: 'Nível',
-        opcoes: NIVEIS,
-      },
-      {
-        chave: 'palestrante',
-        label: 'Palestrante',
-        opcoes: palestrantesOpcoes.length ? palestrantesOpcoes : ['— cadastre palestrantes —'],
-        buscavel: true,
-      },
-      {
-        chave: 'tags',
-        label: 'Tags',
-        opcoes: TAGS,
-      },
-      {
-        chave: 'status',
-        label: 'Status',
-        opcoes: STATUS_OPCOES,
-      },
+      { chave: 'status', label: 'Status', opcoes: Object.values(STATUS_LABEL) },
+      { chave: 'tipo',   label: 'Tipo',   opcoes: TIPOS_OPCOES },
     ],
     ordenarPor: [
-      { v: 'horario',     l: 'Horário' },
-      { v: 'titulo',      l: 'Título' },
-      { v: 'trilha',      l: 'Trilha' },
-      { v: 'palestrante', l: 'Palestrante' },
-      { v: 'nivel',       l: 'Nível' },
+      { v: 'titulo',  l: 'Título' },
+      { v: 'formato', l: 'Tipo' },
+      { v: 'nivel',   l: 'Nível' },
     ],
   };
 
-  // Mapeamento de filtros → campos dos dados
   const camposFiltro = {
-    busca:       ['titulo', 'palestrante', 'local'],
-    buscaId:     'id',
-    trilha:      item => NOME_TRILHA[item.trilha] || item.trilha,
-    tipo:        'tipo',
-    espaco:      'local',
-    palestrante: 'palestrante',
-    nivel:       'nivel',
-    tags:        item => (item.tags || []),
-    status:      item => {
-      const m = { andamento: 'Pendente', aprovado: 'Aprovado' };
-      return m[item.status] || item.status;
-    },
-    ordenar: {
-      horario:     'horario',
-      titulo:      'titulo',
-      trilha:      'trilha',
-      palestrante: 'palestrante',
-      nivel:       'nivel',
-    },
+    busca:   ['titulo', 'descricao'],
+    buscaId: 'id_proposal',
+    status:  item => STATUS_LABEL[item.status] || item.status,
+    tipo:    'formato',
+    ordenar: { titulo: 'titulo', formato: 'formato', nivel: 'nivel' },
   };
 
-  // Filtro de dia/período manual (não coberto pelo helper genérico)
-  function filtrarPeriodo(s) {
-    if (!filtros.periodo.length || filtros.periodo.includes('Todos')) return true;
-    const h = parseInt((s.horario || '00:00').split(':')[0]);
-    return filtros.periodo.some(p => {
-      if (p === 'Manhã') return h >= 6  && h < 12;
-      if (p === 'Tarde') return h >= 12 && h < 18;
-      if (p === 'Noite') return h >= 18;
-      return true;
-    });
+  const propostasFiltradas = aplicarFiltros(propostas, filtros, camposFiltro);
+
+  const nomeTrilha = (id) => trilhas.find(t => t.id_track === id)?.nome || (id ? `Trilha #${id}` : 'Sem trilha');
+  const corTrilha  = (id) => { const t = trilhas.find(t => t.id_track === id); return t ? corParaTrilha(t.nome) : '#9CA3AF'; };
+  const naGrade    = (id_proposal) => sessoes.some(s => s.id_proposal === id_proposal);
+
+  function abrirView(p)   { setSelected(p); setPopup('view'); setErro(''); }
+  function abrirEditar(p) {
+    setForm({ titulo: p.titulo, formato: p.formato || 'Palestra', id_track: p.id_track || '', nivel: p.nivel || '', descricao: p.descricao || '' });
+    setSelected(p); setPopup('editar'); setErro('');
   }
 
-  function filtrarDia(s) {
-    if (!filtros.dia.length) return true;
-    // mapeia '21/09' → dia numérico
-    return filtros.dia.some(d => s.dia === d.split('/')[0]);
+  async function salvarEdicao() {
+    setLoading(true); setErro('');
+    try {
+      await editarProposta(selected.id_proposal, {
+        titulo:    form.titulo,
+        formato:   form.formato,
+        id_track:  form.id_track ? parseInt(form.id_track) : null,
+        nivel:     form.nivel,
+        descricao: form.descricao,
+      });
+      await onRefresh();
+      setPopup(null);
+      toast.success('Proposta atualizada!');
+    } catch (err) {
+      const msg = err.status === 0 ? 'Sem conexão com o servidor.' : (err.message || 'Erro ao salvar. Tente novamente.');
+      setErro(msg);
+      if (err.status === 0) toast.error(msg);
+    } finally {
+      setLoading(false);
+    }
   }
 
-  const sessoesFiltradas = aplicarFiltros(sessoes, filtros, camposFiltro)
-    .filter(filtrarPeriodo)
-    .filter(filtrarDia);
-
-  // ── CRUD ──
-  function abrirView(s)  { setSelected(s); setPopup('view'); }
-  function abrirEditar(s) {
-    setForm({ titulo: s.titulo, trilha: s.trilha, atividade: s.atividade,
-              local: s.local, horario: s.horario, palestrante: s.palestrante,
-              dia: s.dia, descricao: s.descricao || '', nivel: s.nivel || '', tags: s.tags || [] });
-    setSelected(s); setPopup('editar');
+  async function salvarNovo() {
+    if (!form.titulo.trim()) { setErro('O título é obrigatório.'); return; }
+    if (!form.id_track)      { setErro('Selecione uma trilha.'); return; }
+    setLoading(true); setErro('');
+    try {
+      await criarProposta({
+        titulo:     form.titulo,
+        formato:    form.formato,
+        id_track:   parseInt(form.id_track),
+        nivel:      form.nivel,
+        descricao:  form.descricao,
+        id_creator: dados?.usuarioLogado?.id_usuario || 1,
+      });
+      await onRefresh();
+      setForm(FORM_VAZIO); setPopup(null);
+      toast.success('Proposta criada com sucesso!');
+    } catch (err) {
+      const msg = err.status === 0 ? 'Sem conexão com o servidor.' : (err.message || 'Erro ao criar. Tente novamente.');
+      setErro(msg);
+      if (err.status === 0) toast.error(msg);
+    } finally {
+      setLoading(false);
+    }
   }
 
-  function salvarEdicao() {
-    setDados(d => ({ ...d, sessoes: d.sessoes.map(s => s.id === selected.id ? { ...s, ...form } : s) }));
-    setPopup(null);
+  async function aprovar() {
+    setLoading(true); setErro('');
+    try {
+      await editarProposta(selected.id_proposal, { status: 'APPROVED' });
+      await onRefresh();
+      setPopup(null);
+    } catch (err) {
+      setErro(err.message || 'Erro ao aprovar.');
+    } finally {
+      setLoading(false);
+    }
   }
 
-  function salvarNovo() {
-    const novoId = proximoId('S', sessoes);
-    setDados(d => ({ ...d, sessoes: [...d.sessoes, { ...form, id: novoId, status: 'andamento' }] }));
-    setForm(FORM_VAZIO); setPopup(null);
+  async function deletar() {
+    setLoading(true); setErro('');
+    try {
+      await deletarProposta(selected.id_proposal);
+      await onRefresh();
+      setConfirmDel(false); setPopup(null); setSelected(null);
+      toast.success('Proposta excluída!');
+    } catch (err) {
+      const msg = err.status === 0 ? 'Sem conexão com o servidor.' : (err.message || 'Erro ao excluir.');
+      setErro(msg);
+      toast.error(msg);
+      setConfirmDel(false);
+    } finally {
+      setLoading(false);
+    }
   }
-
-  function deletar() {
-    setDados(d => ({ ...d, sessoes: d.sessoes.filter(s => s.id !== selected.id) }));
-    setConfirmDel(false); setPopup(null); setSelected(null);
-  }
-
-  function aprovar() {
-    setDados(d => ({ ...d, sessoes: d.sessoes.map(s => s.id === selected.id ? { ...s, status: 'aprovado' } : s) }));
-    setSelected(prev => ({ ...prev, status: 'aprovado' })); setPopup(null);
-  }
-
-  const trilhaOpts = trilhas.map(t => ({
-    v: Object.keys(COR_TRILHA).find(k => t.nome.toLowerCase().includes(k)) || t.id,
-    l: t.nome,
-  }));
 
   const campoForm = (lbl, name, tipo = 'input', opts = []) => (
     <div className="campo-popup" key={name}>
@@ -215,9 +174,9 @@ export default function Sessoes({ dados, setDados }) {
               filtros={filtros}
               setFiltros={setFiltros}
               config={configFiltro}
-              placeholder="Pesquisar por título, palestrante..."
-              totalResultados={sessoesFiltradas.length}
-              totalGeral={sessoes.length}
+              placeholder="Pesquisar por título, descrição..."
+              totalResultados={propostasFiltradas.length}
+              totalGeral={propostas.length}
             />
           </div>
 
@@ -225,13 +184,18 @@ export default function Sessoes({ dados, setDados }) {
             <div>
               <div className="page-card1">
                 <div className="resume2">
-                  <h2>Sessões</h2>
+                  <h2>Propostas</h2>
                   <img className="pcard-icon" src="imgbb/sessao.png" alt="" />
                 </div>
                 <div className="pnumber-status">
                   <div>
-                    <h1 className="pcard-number">{sessoesFiltradas.length}<span style={{fontSize:14,fontWeight:400,color:'#888'}}>/{sessoes.length}</span></h1>
-                    <p className="pcard-subtitle">Sessões{sessoesFiltradas.length !== sessoes.length ? ' encontradas' : ' cadastradas'}</p>
+                    <h1 className="pcard-number">
+                      {propostasFiltradas.length}
+                      <span style={{fontSize:14,fontWeight:400,color:'#888'}}>/{propostas.length}</span>
+                    </h1>
+                    <p className="pcard-subtitle">
+                      Propostas{propostasFiltradas.length !== propostas.length ? ' encontradas' : ' cadastradas'}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -239,7 +203,7 @@ export default function Sessoes({ dados, setDados }) {
                 <div className="status"><h2>Status</h2></div>
                 <div className="status-page">
                   <div className="statusp-item green"><span className="pulse" /><small>{aprovadas} aprovadas</small></div>
-                  <div className="statusp-item orange"><span className="pulse" /><small>{andamento} em andamento</small></div>
+                  <div className="statusp-item orange"><span className="pulse" /><small>{pendentes} em curadoria</small></div>
                   <p className="pcard-subtitle" style={{ marginLeft: 10 }}>Desde a última atualização</p>
                 </div>
               </div>
@@ -247,49 +211,47 @@ export default function Sessoes({ dados, setDados }) {
 
             <div className="page-card3">
               <div className="card-list">
-                {sessoesFiltradas.map(s => {
-                  const cor = COR_TRILHA[s.trilha] || '#9CA3AF';
-                  const cls = classeTrilha(s.trilha);
+                {propostasFiltradas.map(p => {
+                  const cor = corTrilha(p.id_track);
+                  const agendada = naGrade(p.id_proposal);
                   return (
-                    <div key={s.id} className={`card-evento ${cls}`}
+                    <div key={p.id_proposal} className={`card-evento`}
                       style={{ position: 'relative', overflow: 'hidden', cursor: 'pointer' }}
-                      onClick={() => abrirView(s)}>
+                      onClick={() => abrirView(p)}>
                       <div style={{ position:'absolute', right:0, top:0, width:10, height:'100%',
                         background: cor, borderRadius:'0 16px 16px 0' }} />
                       <div className="card-info">
-
-                        <h2 className="card-titulo">{s.titulo}</h2>
-                        <p className="card-trilha">
-                          {s.trilha
-                            ? (NOME_TRILHA[s.trilha] || s.trilha)
-                            : <span style={{ color: '#9CA3AF' }}>Sem trilha</span>}
-                        </p>
-                        <p className="card-horario">{s.horario} — Dia {s.dia}</p>
-                        {s.nivel && <span className="card-nivel-badge">{s.nivel}</span>}
+                        <h2 className="card-titulo">{p.titulo}</h2>
+                        <p className="card-trilha">{nomeTrilha(p.id_track)}</p>
+                        <p className="card-horario">{p.formato || '—'} {p.nivel ? `· ${p.nivel}` : ''}</p>
+                        {agendada && <span className="card-nivel-badge" style={{ background: '#00D26A' }}>Na grade</span>}
                       </div>
                       <div className="status-bola-evento"
-                        style={{ background: s.status === 'aprovado' ? '#00D26A' : '#F59E0B' }} />
+                        style={{ background: p.status === 'APPROVED' ? '#00D26A' : p.status === 'REJECTED' ? '#EF4444' : '#F59E0B' }} />
                     </div>
                   );
                 })}
-                {sessoesFiltradas.length === 0 && (
-                  <p style={{ color: '#888', padding: 16 }}>Nenhuma sessão encontrada com os filtros aplicados.</p>
+                {propostasFiltradas.length === 0 && (
+                  <p style={{ color: '#888', padding: 16 }}>Nenhuma proposta encontrada com os filtros aplicados.</p>
                 )}
               </div>
             </div>
           </div>
 
           <div className="below-btn">
-            <button className="ce-btnp" onClick={() => { setForm(FORM_VAZIO); setPopup('criar'); }}>Criar sessão</button>
+            <button className="ce-btnp" onClick={() => { setForm(FORM_VAZIO); setPopup('criar'); setErro(''); }}>
+              Criar proposta
+            </button>
           </div>
         </div>
       </div>
 
-      {/* POPUP VIEW */}
+      {/* VIEW */}
       <PopupCard aberto={popup === 'view'} onFechar={() => setPopup(null)}
         onEditar={() => abrirEditar(selected)} onDeletar={() => setConfirmDel(true)}
-        onAprovar={aprovar} statusItem={selected?.status}
-        trilhaCor={COR_TRILHA[selected?.trilha] || '#9CA3AF'}>
+        onAprovar={selected?.status !== 'APPROVED' ? aprovar : null}
+        statusItem={selected?.status === 'APPROVED' ? 'aprovado' : 'andamento'}
+        trilhaCor={corTrilha(selected?.id_track)}>
         {selected && (
           <>
             <div className="topo-card">
@@ -297,65 +259,60 @@ export default function Sessoes({ dados, setDados }) {
               <img className="popup-logo-bb" src="imgbb/bb.png" alt="" />
             </div>
             <p className="popup-card-trilha">
-              Trilha: {selected.trilha ? (NOME_TRILHA[selected.trilha] || selected.trilha)
-                : <em style={{ color: '#9CA3AF' }}>Sem trilha</em>}
+              Trilha: {nomeTrilha(selected.id_track)}
             </p>
             <div className="popup-card-descricao">
               <h3>Descrição</h3>
               <p>{selected.descricao || '—'}</p>
             </div>
-            <p className="popup-card-horario">{selected.horario} — Dia {selected.dia}</p>
+            <p className="popup-card-horario">{selected.formato} {selected.nivel ? `· ${selected.nivel}` : ''}</p>
             <div className="popup-card-info">
               <div>
-                <p><strong>Local:</strong> {selected.local}</p>
-                <p><strong>Palestrante:</strong> {selected.palestrante}</p>
-                <p><strong>Atividade:</strong> {selected.atividade}</p>
-                <p><strong>Nível:</strong> {selected.nivel || '—'}</p>
-                <p><strong>Status:</strong> {selected.status}</p>
+                <p><strong>Status:</strong> {STATUS_LABEL[selected.status] || selected.status}</p>
+                <p><strong>Na grade:</strong> {naGrade(selected.id_proposal) ? 'Sim' : 'Não'}</p>
               </div>
-              <div><p><strong>ID:</strong> {selected.id}</p></div>
+              <div><p><strong>ID:</strong> {selected.id_proposal}</p></div>
             </div>
+            {erro && <p style={{ color: '#D92D20', fontSize: 13, margin: '8px 0 0' }}>{erro}</p>}
           </>
         )}
       </PopupCard>
 
-      {/* POPUP EDITAR */}
-      <Popup aberto={popup === 'editar'} onFechar={() => setPopup(null)} titulo="Editar Sessão">
+      {/* EDITAR */}
+      <Popup aberto={popup === 'editar'} onFechar={() => setPopup(null)} titulo="Editar Proposta">
         {campoForm('Título', 'titulo')}
-        {campoForm('Trilha', 'trilha', 'select', trilhaOpts)}
-        {campoForm('Atividade', 'atividade', 'select', atividades.map(a => ({ v: a.nome, l: a.nome })))}
-        {campoForm('Local', 'local', 'select', espacos.map(e => ({ v: e.nome, l: e.nome })))}
-        {campoForm('Horário', 'horario', 'select', horarios.map(h => ({ v: h.hora, l: `${h.hora} — Dia ${h.dia}` })))}
-        {campoForm('Palestrante', 'palestrante', 'select', palestrantes.map(p => ({ v: p.nome, l: p.nome })))}
+        {campoForm('Tipo', 'formato', 'select', TIPOS_OPCOES.map(t => ({ v: t, l: t })))}
+        {campoForm('Trilha', 'id_track', 'select', trilhas.map(t => ({ v: t.id_track, l: t.nome })))}
         {campoForm('Nível', 'nivel', 'select', NIVEIS.map(n => ({ v: n, l: n })))}
-        {campoForm('Dia', 'dia', 'select', [{ v:'26', l:'26/03' },{ v:'27', l:'27/03' },{ v:'28', l:'28/03' }])}
         {campoForm('Descrição', 'descricao', 'textarea')}
+        {erro && <p style={{ color: '#D92D20', fontSize: 13, margin: '4px 0' }}>{erro}</p>}
         <div className="popup-botoes">
-          <button className="cancelar-btn" onClick={() => setPopup('view')}>Cancelar</button>
-          <button className="salvar-btn" onClick={salvarEdicao}>Salvar Alterações</button>
+          <button className="cancelar-btn" onClick={() => setPopup('view')} disabled={loading}>Cancelar</button>
+          <button className="salvar-btn" onClick={salvarEdicao} disabled={loading}>
+            {loading ? 'Salvando...' : 'Salvar Alterações'}
+          </button>
         </div>
       </Popup>
 
-      {/* POPUP CRIAR */}
-      <Popup aberto={popup === 'criar'} onFechar={() => setPopup(null)} titulo="Cadastrar Sessão">
+      {/* CRIAR */}
+      <Popup aberto={popup === 'criar'} onFechar={() => setPopup(null)} titulo="Cadastrar Proposta">
         {campoForm('Título', 'titulo')}
-        {campoForm('Trilha', 'trilha', 'select', trilhaOpts)}
-        {campoForm('Atividade', 'atividade', 'select', atividades.map(a => ({ v: a.nome, l: a.nome })))}
-        {campoForm('Local', 'local', 'select', espacos.map(e => ({ v: e.nome, l: e.nome })))}
-        {campoForm('Horário', 'horario', 'select', horarios.map(h => ({ v: h.hora, l: `${h.hora} — Dia ${h.dia}` })))}
-        {campoForm('Palestrante', 'palestrante', 'select', palestrantes.map(p => ({ v: p.nome, l: p.nome })))}
+        {campoForm('Tipo', 'formato', 'select', TIPOS_OPCOES.map(t => ({ v: t, l: t })))}
+        {campoForm('Trilha', 'id_track', 'select', trilhas.map(t => ({ v: t.id_track, l: t.nome })))}
         {campoForm('Nível', 'nivel', 'select', NIVEIS.map(n => ({ v: n, l: n })))}
-        {campoForm('Dia', 'dia', 'select', [{ v:'26', l:'26/03' },{ v:'27', l:'27/03' },{ v:'28', l:'28/03' }])}
         {campoForm('Descrição', 'descricao', 'textarea')}
+        {erro && <p style={{ color: '#D92D20', fontSize: 13, margin: '4px 0' }}>{erro}</p>}
         <div className="popup-botoes">
-          <button className="cancelar-btn" onClick={() => setPopup(null)}>Cancelar</button>
-          <button className="salvar-btn" onClick={salvarNovo}>Salvar</button>
+          <button className="cancelar-btn" onClick={() => setPopup(null)} disabled={loading}>Cancelar</button>
+          <button className="salvar-btn" onClick={salvarNovo} disabled={loading}>
+            {loading ? 'Salvando...' : 'Salvar'}
+          </button>
         </div>
       </Popup>
 
       {confirmDel && (
         <ConfirmDelete
-          mensagem={`Deseja excluir a sessão "${selected?.titulo}" permanentemente?`}
+          mensagem={`Deseja excluir a proposta "${selected?.titulo}" permanentemente?${naGrade(selected?.id_proposal) ? ' Atenção: esta proposta está na grade!' : ''}`}
           onConfirmar={deletar}
           onCancelar={() => setConfirmDel(false)}
         />

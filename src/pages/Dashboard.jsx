@@ -1,34 +1,30 @@
-import { COR_TRILHA, NOME_TRILHA } from '../data/inicial.js';
+import { corParaTrilha } from '../data/inicial.js';
+
+const STATUS_LABEL = { PENDING: 'Pendente', REVIEW: 'Em Revisão', APPROVED: 'Aprovado', REJECTED: 'Rejeitado' };
 
 export default function Dashboard({ dados }) {
-  const sessoes      = dados?.sessoes      || [];
+  const propostas    = dados?.propostas    || [];
   const trilhas      = dados?.trilhas      || [];
   const palestrantes = dados?.palestrantes || [];
   const alertas      = dados?.alertas      || [];
+  const sessoes      = dados?.sessoes      || [];  // grade (junction)
+  const horarios     = dados?.horarios     || [];  // slots
 
-  // Contagens de status
-  const contarStatus = (lista) => ({
-    aprovado:  lista.filter(i => i.status === 'aprovado').length,
-    andamento: lista.filter(i => i.status === 'andamento').length,
-    conflito:  lista.filter(i => i.status === 'conflito').length,
-  });
-
-  const stSessoes = contarStatus(sessoes);
-  const stPalestrantes = {
-    ocupado:    palestrantes.filter(p => (p.horarios || []).length > 0).length,
-    desocupado: palestrantes.filter(p => !(p.horarios || []).length).length,
-  };
+  // Métricas de propostas
+  const aprovadas  = propostas.filter(p => p.status === 'APPROVED').length;
+  const pendentes  = propostas.filter(p => p.status === 'PENDING' || p.status === 'REVIEW').length;
+  const rejeitadas = propostas.filter(p => p.status === 'REJECTED').length;
 
   const cards = [
     {
-      titulo: 'Sessões',
+      titulo: 'Propostas',
       icon: 'imgbb/sessao.png',
-      numero: sessoes.length,
-      sub: 'Sessões cadastradas',
+      numero: propostas.length,
+      sub: 'Propostas cadastradas',
       status: [
-        { cls: 'green',  txt: `${stSessoes.aprovado} verificadas` },
-        { cls: 'orange', txt: `${stSessoes.andamento} em andamento` },
-        { cls: 'red',    txt: `${alertas.length} conflitos` },
+        { cls: 'green',  txt: `${aprovadas} aprovadas` },
+        { cls: 'orange', txt: `${pendentes} em curadoria` },
+        { cls: 'red',    txt: `${rejeitadas} rejeitadas` },
       ],
     },
     {
@@ -37,8 +33,8 @@ export default function Dashboard({ dados }) {
       numero: trilhas.length,
       sub: 'Trilhas cadastradas',
       status: [
-        { cls: 'green',  txt: `${contarStatus(trilhas).aprovado} verificadas` },
-        { cls: 'orange', txt: `${contarStatus(trilhas).andamento} em andamento` },
+        { cls: 'green',  txt: `${trilhas.length} ativas` },
+        { cls: 'orange', txt: `${propostas.filter(p => !p.id_track).length} sem trilha` },
       ],
     },
     {
@@ -47,55 +43,38 @@ export default function Dashboard({ dados }) {
       numero: palestrantes.length,
       sub: 'Palestrantes cadastrados',
       status: [
-        { cls: 'green',  txt: `${stPalestrantes.ocupado} Ocupados` },
-        { cls: 'orange', txt: `${stPalestrantes.desocupado} Desocupados` },
+        { cls: 'green',  txt: `${palestrantes.length} cadastrados` },
       ],
     },
     {
-      titulo: 'Alertas',
+      titulo: 'Grade',
       icon: 'https://static.thenounproject.com/png/1393909-200.png',
-      numero: alertas.length,
-      sub: 'Detectados no total',
+      numero: sessoes.length,
+      sub: 'Sessões na grade',
       status: [
-        { cls: 'red', txt: `${alertas.filter(a => a.tipo === 'similaridade').length} similaridade` },
-        { cls: 'red', txt: `${alertas.filter(a => a.tipo === 'tecnico').length} técnicos` },
+        { cls: 'green',  txt: `${sessoes.length} agendadas` },
+        { cls: 'orange', txt: `${horarios.length} slots disponíveis` },
       ],
     },
   ];
 
-  // Últimas sessões/trilhas como "atualizações"
+  // Atualizações recentes: últimas 5 propostas/trilhas criadas
   const atualizacoes = [
-    ...sessoes.slice(-3).map(s => ({ tempo: 'Recente', txt: `Sessão cadastrada: ${s.titulo}` })),
+    ...propostas.slice(-3).map(p => ({ tempo: 'Recente', txt: `Proposta cadastrada: ${p.titulo}` })),
     ...trilhas.slice(-2).map(t => ({ tempo: 'Recente', txt: `Trilha criada: ${t.nome}` })),
-  ].slice(0, 5).length
-    ? [
-        ...sessoes.slice(-3).map(s => ({ tempo: 'Recente', txt: `Sessão cadastrada: ${s.titulo}` })),
-        ...trilhas.slice(-2).map(t => ({ tempo: 'Recente', txt: `Trilha criada: ${t.nome}` })),
-      ].slice(0, 5)
-    : [
-        { tempo: '2h atrás', txt: 'Nova trilha criada: UX & DevEx' },
-        { tempo: '5h atrás', txt: 'Sessão excluída: IA Generativa' },
-        { tempo: '1 dia',    txt: 'Novo palestrante adicionado' },
-        { tempo: '3 dias',   txt: 'Novo alerta de conflito detectado' },
-      ];
+  ].slice(0, 5);
 
-  // Conflitos de similaridade para mini-card
-  const conflitosIA = alertas
-    .filter(a => a.tipo === 'similaridade')
-    .map(a => ({
-      pct: `${a.percentual}%`,
-      txt: a.titulo,
-      cls: (a.percentual || 0) >= 75 ? 'red-conflict' : 'orange-conflict',
-      bar: (a.percentual || 0) >= 75 ? 'red-bar' : 'orange-bar',
-    }));
+  const atualizacoesExibidas = atualizacoes.length > 0 ? atualizacoes : [
+    { tempo: '—', txt: 'Nenhuma atualização recente.' },
+  ];
 
-  // Gráfico de sessões por trilha
-  const sessoesPortrilha = trilhas.map(t => {
-    const chave = t.nome.toLowerCase().replace(/[^a-z]/g, '').substring(0, 4);
-    const qtd = sessoes.filter(s => s.trilha && t.nome.toLowerCase().includes(s.trilha)).length;
-    return { label: t.nome, cor: t.cor || '#465EFF', qtd };
-  });
-  const maxQtd = Math.max(...sessoesPortrilha.map(t => t.qtd), 1);
+  // Gráfico: propostas por trilha
+  const propostasPorTrilha = trilhas.map(t => ({
+    label: t.nome,
+    cor:   corParaTrilha(t.nome),
+    qtd:   propostas.filter(p => p.id_track === t.id_track).length,
+  }));
+  const maxQtd = Math.max(...propostasPorTrilha.map(t => t.qtd), 1);
 
   return (
     <div className="page">
@@ -131,7 +110,7 @@ export default function Dashboard({ dados }) {
           <div className="mini-programacao-container">
             <div className="mini-programacao-header"><h1>Atualizações do Sistema</h1></div>
             <div className="mini-scroll-area">
-              {atualizacoes.map((a, i) => (
+              {atualizacoesExibidas.map((a, i) => (
                 <div key={i} className="mini-programacao-card">
                   <div className="mini-horario-box"><span>{a.tempo}</span></div>
                   <div className="mini-programacao-content"><h2>{a.txt}</h2></div>
@@ -140,33 +119,37 @@ export default function Dashboard({ dados }) {
             </div>
           </div>
 
-          {/* Conflitos IA */}
+          {/* Alertas IA */}
           <div className="mini-programacao-container">
             <div className="mini-programacao-header" id="Hconflito"><h1>Conflitos Detectados</h1></div>
             <div className="mini-scroll-area">
-              {conflitosIA.length === 0 && (
+              {alertas.length === 0 && (
                 <div className="mini-programacao-card">
-                  <div className="mini-programacao-content"><h2>Nenhum conflito de similaridade</h2></div>
+                  <div className="mini-programacao-content">
+                    <h2>{sessoes.length === 0 ? 'Agende sessões para detectar conflitos' : 'Nenhum conflito detectado'}</h2>
+                  </div>
                 </div>
               )}
-              {conflitosIA.map((c, i) => (
+              {alertas.filter(a => a.tipo === 'similaridade').map((c, i) => (
                 <div key={i} className="mini-programacao-card">
-                  <div className={`mini-conflito-box ${c.cls}`}><span>{c.pct}</span></div>
-                  <div className="mini-programacao-content"><h2>{c.txt}</h2></div>
-                  <div className={`mini-color-bar ${c.bar}`} />
+                  <div className={`mini-conflito-box ${(c.percentual || 0) >= 75 ? 'red-conflict' : 'orange-conflict'}`}>
+                    <span>{c.percentual}%</span>
+                  </div>
+                  <div className="mini-programacao-content"><h2>{c.titulo}</h2></div>
+                  <div className={`mini-color-bar ${(c.percentual || 0) >= 75 ? 'red-bar' : 'orange-bar'}`} />
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Gráfico de trilhas */}
+          {/* Gráfico de propostas por trilha */}
           <div className="trilha-chart-card">
             <div className="trilha-chart-header">
-              <h2>Sessões por trilha</h2>
-              <p>Total de sessões: {sessoes.length}</p>
+              <h2>Propostas por trilha</h2>
+              <p>Total: {propostas.length}</p>
             </div>
             <div className="trilha-chart-scroll">
-              {sessoesPortrilha.map((t, i) => (
+              {propostasPorTrilha.map((t, i) => (
                 <div key={i} className="trilha-chart-row">
                   <span className="trilha-chart-label">{t.label}</span>
                   <div className="trilha-chart-bar-area">
@@ -182,22 +165,24 @@ export default function Dashboard({ dados }) {
                   </div>
                 </div>
               ))}
-              {/* Sessões sem trilha */}
-              {sessoes.filter(s => !s.trilha).length > 0 && (
+              {propostas.filter(p => !p.id_track).length > 0 && (
                 <div className="trilha-chart-row">
                   <span className="trilha-chart-label">Sem trilha</span>
                   <div className="trilha-chart-bar-area">
                     <div
                       className="trilha-chart-bar"
                       style={{
-                        width: `${Math.max((sessoes.filter(s => !s.trilha).length / maxQtd) * 100, 8)}%`,
+                        width: `${Math.max((propostas.filter(p => !p.id_track).length / maxQtd) * 100, 8)}%`,
                         background: '#9CA3AF',
                       }}
                     >
-                      <span>{sessoes.filter(s => !s.trilha).length}</span>
+                      <span>{propostas.filter(p => !p.id_track).length}</span>
                     </div>
                   </div>
                 </div>
+              )}
+              {trilhas.length === 0 && (
+                <p style={{ color: '#9CA3AF', fontSize: 13 }}>Cadastre trilhas para ver o gráfico.</p>
               )}
             </div>
           </div>
