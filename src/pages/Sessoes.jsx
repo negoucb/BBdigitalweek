@@ -7,6 +7,7 @@ import {
   criarProposta,
   editarProposta,
   deletarProposta,
+  criarSessao,
 } from '../services/api.js';
 import { toast } from '../components/Toast.jsx';
 
@@ -29,9 +30,13 @@ export default function Sessoes({ dados, onRefresh }) {
   const [erro, setErro]             = useState('');
 
   // "Sessões" no frontend = Proposals no backend
-  const propostas = dados?.propostas || [];
-  const trilhas   = dados?.trilhas   || [];
-  const sessoes   = dados?.sessoes   || []; // grade de sessões (junction)
+  const propostas  = dados?.propostas || [];
+  const trilhas    = dados?.trilhas   || [];
+  const sessoes    = dados?.sessoes   || []; // grade de sessões (junction)
+  const espacos    = dados?.espacos   || [];
+  const horarios   = dados?.horarios  || [];
+
+  const [formAgendamento, setFormAgendamento] = useState({ id_stage: '', id_slot: '' });
 
   const aprovadas = propostas.filter(p => p.status === 'APPROVED').length;
   const pendentes = propostas.filter(p => p.status === 'PENDING' || p.status === 'REVIEW').length;
@@ -123,6 +128,33 @@ export default function Sessoes({ dados, onRefresh }) {
       setPopup(null);
     } catch (err) {
       setErro(err.message || 'Erro ao aprovar.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function agendar() {
+    if (!formAgendamento.id_stage) { setErro('Selecione um espaço.'); return; }
+    if (!formAgendamento.id_slot)  { setErro('Selecione um horário.'); return; }
+    setLoading(true); setErro('');
+    try {
+      await criarSessao({
+        id_proposal: selected.id_proposal,
+        id_stage: parseInt(formAgendamento.id_stage),
+        id_slot: parseInt(formAgendamento.id_slot),
+        id_track: selected.id_track || 1, // Passa a trilha atual
+      });
+      // Importante: atualizar grade/sessoes no contexto. onRefresh aqui recarrega propostas, precisamos garantir que recarregue sessoes tb. Mas para não quebrar, apenas avisamos sucesso. (Idealmente o dashboard já vai buscar no reload).
+      await onRefresh();
+      // Mostramos o toast e fechamos. O ideal seria ter refreshSessoes aqui, mas faremos a página dar reload se necessário, ou só notificar.
+      setPopup(null);
+      toast.success('Atividade agendada com sucesso na grade!');
+      // Redirecionamento forçado para a grade para atualizar a view de sessoes (opcional):
+      window.location.reload(); 
+    } catch (err) {
+      const msg = err.status === 0 ? 'Sem conexão com o servidor.' : (err.message || 'Erro ao agendar.');
+      setErro(msg);
+      if (err.status === 0) toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -224,7 +256,7 @@ export default function Sessoes({ dados, onRefresh }) {
                         <h2 className="card-titulo">{p.titulo}</h2>
                         <p className="card-trilha">{nomeTrilha(p.id_track)}</p>
                         <p className="card-horario">{p.formato || '—'} {p.nivel ? `· ${p.nivel}` : ''}</p>
-                        {agendada && <span className="card-nivel-badge" style={{ background: '#00D26A' }}>Na grade</span>}
+                        {agendada && <span style={{ color: '#00D26A', fontSize: 13, fontWeight: 600 }}>Na grade</span>}
                       </div>
                       <div className="status-bola-evento"
                         style={{ background: p.status === 'APPROVED' ? '#00D26A' : p.status === 'REJECTED' ? '#EF4444' : '#F59E0B' }} />
@@ -250,6 +282,7 @@ export default function Sessoes({ dados, onRefresh }) {
       <PopupCard aberto={popup === 'view'} onFechar={() => setPopup(null)}
         onEditar={() => abrirEditar(selected)} onDeletar={() => setConfirmDel(true)}
         onAprovar={selected?.status !== 'APPROVED' ? aprovar : null}
+        onAgendar={selected?.status === 'APPROVED' && !naGrade(selected?.id_proposal) ? () => { setFormAgendamento({ id_stage: '', id_slot: '' }); setPopup('agendar'); setErro(''); } : null}
         statusItem={selected?.status === 'APPROVED' ? 'aprovado' : 'andamento'}
         trilhaCor={corTrilha(selected?.id_track)}>
         {selected && (
@@ -306,6 +339,37 @@ export default function Sessoes({ dados, onRefresh }) {
           <button className="cancelar-btn" onClick={() => setPopup(null)} disabled={loading}>Cancelar</button>
           <button className="salvar-btn" onClick={salvarNovo} disabled={loading}>
             {loading ? 'Salvando...' : 'Salvar'}
+          </button>
+        </div>
+      </Popup>
+
+      {/* AGENDAR */}
+      <Popup aberto={popup === 'agendar'} onFechar={() => setPopup(null)} titulo="Agendar na Grade">
+        <p style={{ marginBottom: 16, fontSize: 14, color: '#666' }}>
+          Selecione onde e quando a atividade <strong>{selected?.titulo}</strong> ocorrerá.
+        </p>
+        <div className="campo-popup">
+          <label>Espaço / Palco</label>
+          <select value={formAgendamento.id_stage} onChange={e => setFormAgendamento(f => ({ ...f, id_stage: e.target.value }))}>
+            <option value="">Selecione...</option>
+            {espacos.map(e => <option key={e.id_stage} value={e.id_stage}>{e.nome}</option>)}
+          </select>
+        </div>
+        <div className="campo-popup">
+          <label>Horário (Slot)</label>
+          <select value={formAgendamento.id_slot} onChange={e => setFormAgendamento(f => ({ ...f, id_slot: e.target.value }))}>
+            <option value="">Selecione...</option>
+            {horarios.map(h => {
+              const str = h.start_time ? new Date(h.start_time).toLocaleString('pt-BR') : `Slot #${h.id_slot}`;
+              return <option key={h.id_slot} value={h.id_slot}>{str}</option>;
+            })}
+          </select>
+        </div>
+        {erro && <p style={{ color: '#D92D20', fontSize: 13, margin: '4px 0' }}>{erro}</p>}
+        <div className="popup-botoes">
+          <button className="cancelar-btn" onClick={() => setPopup('view')} disabled={loading}>Cancelar</button>
+          <button className="salvar-btn" onClick={agendar} disabled={loading} style={{ background: '#2563eb', color: '#fff' }}>
+            {loading ? 'Agendando...' : 'Confirmar Agendamento'}
           </button>
         </div>
       </Popup>

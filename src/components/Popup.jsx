@@ -22,6 +22,7 @@ export function PopupCard({
   onEditar,
   onDeletar,
   onAprovar,
+  onAgendar,
   statusItem,
   trilhaCor,
   children,
@@ -53,6 +54,12 @@ export function PopupCard({
             {onAprovar && statusItem === 'andamento' && (
               <button className="evento-btn-aprovar" onClick={onAprovar}>
                 ✓ Aprovar
+              </button>
+            )}
+            {/* Agendar na Grade — para itens aprovados */}
+            {onAgendar && statusItem === 'aprovado' && (
+              <button className="evento-btn-aprovar" style={{ background: '#3b82f6', borderColor: '#3b82f6' }} onClick={onAgendar}>
+                📅 Agendar na Grade
               </button>
             )}
             {/* Editar */}
