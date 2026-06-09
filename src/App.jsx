@@ -20,6 +20,7 @@ import {
   getPalestrantes,
   getEspacos,
   getHorarios,
+  getAlertasGlobais,
   logout,
 } from './services/api.js';
 import './styles/global.css';
@@ -81,7 +82,7 @@ export default function App() {
   // ── Carregar todos os dados da API ─────────────────────────────────────────
   const carregarDados = useCallback(async () => {
     try {
-      const [trilhas, propostas, sessoes, palestrantes, espacos, horarios] =
+      const [trilhas, propostas, sessoes, palestrantes, espacos, horarios, alertas] =
         await Promise.allSettled([
           getTrilhas(),
           getPropostas(),
@@ -89,10 +90,11 @@ export default function App() {
           getPalestrantes(),
           getEspacos(),
           getHorarios(),
+          getAlertasGlobais(),
         ]);
 
       // Verifica se alguma requisição falhou por conexão
-      const resultados = [trilhas, propostas, sessoes, palestrantes, espacos, horarios];
+      const resultados = [trilhas, propostas, sessoes, palestrantes, espacos, horarios, alertas];
       const semConexao = resultados.every(r => r.status === 'rejected');
       if (semConexao) {
         setBackendOnline(false);
@@ -111,7 +113,7 @@ export default function App() {
         palestrantes: palestrantes.status === 'fulfilled' ? palestrantes.value : [],
         espacos:      espacos.status      === 'fulfilled' ? espacos.value      : [],
         horarios:     horarios.status     === 'fulfilled' ? horarios.value     : [],
-        alertas:      [],
+        alertas:      alertas.status      === 'fulfilled' ? alertas.value      : [],
       });
     } catch (err) {
       setBackendOnline(false);
@@ -150,6 +152,7 @@ export default function App() {
   const refreshPalestrantes = useCallback(mkRefresh(getPalestrantes, 'palestrantes', 'palestrantes'), []);
   const refreshEspacos      = useCallback(mkRefresh(getEspacos,      'espacos',      'espaços'),      []);
   const refreshHorarios     = useCallback(mkRefresh(getHorarios,     'horarios',     'horários'),     []);
+  const refreshAlertas      = useCallback(mkRefresh(getAlertasGlobais,'alertas',     'alertas'),      []);
 
   // ── Login / Logout ────────────────────────────────────────────────────────
   function handleEntrar(u) {
@@ -194,7 +197,7 @@ export default function App() {
   const paginas = {
     dashboard:    <Dashboard    dados={dados} />,
     grade:        <Grade        dados={dados} onRefresh={refreshSessoes} />,
-    propostas:    <Propostas    dados={dados} onRefresh={refreshPropostas} />,
+    propostas:    <Propostas    dados={dados} onRefresh={refreshAlertas} />,
     sessoes:      <Sessoes      dados={dados} onRefresh={refreshPropostas} />,
     trilhas:      <Trilhas      dados={dados} onRefresh={refreshTrilhas} />,
     atividades:   <Atividades   dados={dados} onRefresh={refreshPropostas} />,

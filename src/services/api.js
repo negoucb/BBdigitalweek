@@ -257,3 +257,13 @@ export async function verificarConflitoSpeaker(id_speaker, id_slot) {
     throw err;
   }
 }
+
+export async function getAlertasGlobais() {
+  const res = await request('/ia/alerts');
+  return res.data?.alerts || [];
+}
+
+export async function scanAlertasGlobais() {
+  const res = await request('/ia/alerts/scan_all', { method: 'POST' });
+  return res.message;
+}
