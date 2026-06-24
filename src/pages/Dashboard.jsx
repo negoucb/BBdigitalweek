@@ -18,7 +18,7 @@ export default function Dashboard({ dados }) {
   const cards = [
     {
       titulo: 'Propostas',
-      icon: 'imgbb/sessao.png',
+      icon: 'https://cdn-icons-png.flaticon.com/512/1442/1442941.png',
       numero: propostas.length,
       sub: 'Propostas cadastradas',
       status: [

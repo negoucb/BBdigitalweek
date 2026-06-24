@@ -217,7 +217,7 @@ export default function Sessoes({ dados, onRefresh }) {
               <div className="page-card1">
                 <div className="resume2">
                   <h2>Propostas</h2>
-                  <img className="pcard-icon" src="imgbb/sessao.png" alt="" />
+                  <img className="pcard-icon" src="https://cdn-icons-png.flaticon.com/512/1442/1442941.png" alt="" />
                 </div>
                 <div className="pnumber-status">
                   <div>
